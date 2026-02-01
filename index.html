@@ -21,7 +21,6 @@
         .chinese-font { font-family: 'Klee One', "BiauKai", serif; }
         .canvas-container { position: relative; background-color: white; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; }
-        /* 隱藏參考畫布的視覺呈現，僅保留邏輯或極低透明度 */
         #ref-canvas { position: absolute; top: 0; left: 0; z-index: 5; opacity: 0; pointer-events: none; }
         #watermark-layer { position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center; font-size: min(70vw, 300px); color: rgba(0,0,0,0.05); pointer-events: none; }
         
@@ -93,7 +92,7 @@
         <div class="mb-4 px-1 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <div class="glass-panel px-4 py-1.5 rounded-full shadow-md flex items-center gap-2">
-                    <span class="text-xs text-slate-500">學生: </span>
+                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">學生: </span>
                     <span id="display-username" class="text-sm font-bold text-slate-700">載入中...</span>
                 </div>
                 <button id="logout-btn" class="p-2 glass-panel rounded-full text-red-500 hover:bg-white/50 active:scale-90 transition-all" title="登出並清除本地進度">
@@ -167,8 +166,8 @@
             <h3 class="font-bold text-slate-700 mb-4">加入新字</h3>
             <div class="space-y-4">
                 <div class="flex justify-center gap-2 mb-4">
-                    <input type="text" id="custom-char-input" maxlength="1" placeholder="字" class="w-22 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400">
-                    <input type="number" id="custom-stroke-input" placeholder="筆劃" class="w-22 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400">
+                    <input type="text" id="custom-char-input" maxlength="1" placeholder="字" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm"">
+                    <input type="number" id="custom-stroke-input" placeholder="筆劃" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm"">
                 </div>
                 <div class="flex gap-2">
                     <button id="cancel-custom" class="flex-1 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold">取消</button>
