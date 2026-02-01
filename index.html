@@ -373,8 +373,8 @@
             const completion = (matchedPixels / (refPixels || 1)) * 100;
             const internalScore = (completion * 3.5) - ((wrongPixels / (refPixels || 1)) * 8);
             
-            // 4. 同時滿足：筆劃數對了 + 結構分數及格 (50)
-            if (currentStrokeCount === target && internalScore >= 50) {
+            // 4. 同時滿足：筆劃數對了 + 結構分數及格 (70)
+            if (currentStrokeCount === target && internalScore >= 70) {
                 characters[currentIndex].completed = true;
                 successTick.classList.add('show');
                 saveProgress();
