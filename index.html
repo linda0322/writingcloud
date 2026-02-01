@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>寫字練習</title>
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/linda0322/writingcloud/refs/heads/main/Icon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            touch-action: none; 
+            -webkit-user-select: none;
+            overflow: hidden; 
+            background-image: url('https://raw.githubusercontent.com/linda0322/writingcloud/refs/heads/main/Sky.png');
+            background-size: cover;
+            background-position: center;
+            background-color: #38C0FF;
+        }
+        .chinese-font { font-family: 'Klee One', "BiauKai", serif; }
+        .canvas-container { position: relative; background-color: white; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; }
+        #watermark-layer { position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center; font-size: min(70vw, 300px); color: #f1f3f5; pointer-events: none; }
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
+        .step-btn.active { background-color: #38C0FF; color: white; }
+        .step-btn.completed::after { content: '✓'; position: absolute; top: -2px; right: -2px; background: #10B981; color: white; width: 14px; height: 14px; border-radius: 50%; font-size: 8px; display: flex; align-items: center; justify-content: center; }
+        
+        /* 進度條樣式 */
+        .progress-bar-container {
+            position: relative;
+            width: 100%;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+            margin-bottom: 25px;
+            margin-top: 10px;
+        }
+        #progress-fill {
+            height: 100%;
+            background-color: #10B981;
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 4px;
+        }
+        #progress-character {
+            position: absolute;
+            bottom: 6px;
+            left: 0%;
+            width: 35px;
+            height: 35px;
+            transform: translateX(-50%);
+            transition: left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; }
+        .modal-overlay.active { display: flex; }
+        #sync-status { transition: opacity 0.3s; opacity: 0; }
+        #sync-status.show { opacity: 1; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- 雲端同步狀態提示 -->
+    <div id="sync-status" class="fixed top-6 right-6 z-[100] glass-panel px-4 py-2 rounded-full shadow-lg flex items-center gap-2 pointer-events-none">
+        <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+        <span class="text-xs font-bold text-slate-600">正在同步雲端...</span>
+    </div>
+
+    <main class="w-full max-w-md">
+        <div class="mb-4 px-1 flex items-center justify-between">
+            <div class="glass-panel px-4 py-1.5 rounded-full shadow-md">
+                <span class="text-xs text-slate-500">你好, </span>
+                <span id="display-username" class="text-sm font-bold text-slate-700">載入中...</span>
+            </div>
+            <button onclick="location.reload()" class="p-2 glass-panel rounded-full text-slate-500">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            </button>
+        </div>
+
+        <!-- 畫布區域 -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="glass-panel px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
+                <span id="stroke-count" class="text-2xl font-black text-slate-700">0</span>
+                <span id="target-stroke" class="text-xs text-slate-400">/ 5</span>
+            </div>
+            <div class="flex gap-2">
+                <button id="undo-btn" class="p-2 glass-panel rounded-full text-slate-600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg></button>
+                <button id="clear-btn" class="px-4 py-2 glass-panel rounded-full font-bold text-xs">清除</button>
+            </div>
+        </div>
+
+        <div class="canvas-container aspect-square w-full rounded-3xl overflow-hidden mb-8 border-2 border-white/50">
+            <div id="watermark-layer" class="chinese-font"></div>
+            <canvas id="drawing-canvas"></canvas>
+            <canvas id="ref-canvas" class="hidden"></canvas>
+        </div>
+
+        <div class="glass-panel p-4 rounded-3xl shadow-xl">
+            <!-- 進度條與角色動畫 -->
+            <div id="progress-text" class="text-[10px] text-slate-400 font-bold mb-2 text-center">準備中...</div>
+            
+            <div class="progress-bar-container">
+                <div id="progress-fill"></div>
+                <!-- 這裡維持使用 Character.gif -->
+                <img id="progress-character" src="https://raw.githubusercontent.com/linda0322/writingcloud/refs/heads/main/Character.gif" alt="角色動畫">
+            </div>
+
+            <div id="step-container" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
+        </div>
+    </main>
+
+    <!-- 用戶登入 Modal -->
+    <div id="user-modal" class="modal-overlay">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-xs text-center flex flex-col items-center">
+            <!-- 登入圖示更新為 Robot.gif -->
+            <img src="https://raw.githubusercontent.com/linda0322/writingcloud/refs/heads/main/Robot.gif" alt="歡迎機器人" class="w-24 h-24 mb-4">
+            <input type="text" id="username-input" placeholder="輸入名字" class="w-full border-2 rounded-xl px-4 py-3 text-center font-bold mb-4 outline-none focus:border-blue-400">
+            <button id="confirm-user" class="w-full py-4 bg-[#38C0FF] text-white rounded-2xl font-bold">開始</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 設定區 ---
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyv9aEZU_P4jJgJAwYnJFs9OdAcPCwOjEUYrgQ0OS8PuCeA_FFu61TnQ6nnSbNsGVpa/exec"; 
+        
+        const canvas = document.getElementById('drawing-canvas');
+        const ctx = canvas.getContext('2d');
+        const refCanvas = document.getElementById('ref-canvas');
+        const refCtx = refCanvas.getContext('2d');
+        const watermark = document.getElementById('watermark-layer');
+        const stepContainer = document.getElementById('step-container');
+        const displayUsername = document.getElementById('display-username');
+        const syncStatus = document.getElementById('sync-status');
+        const progressFill = document.getElementById('progress-fill');
+        const progressChar = document.getElementById('progress-character');
+        const progressText = document.getElementById('progress-text');
+        
+        let characters = [
+            { char: "我", strokes: 7, completed: false },
+            { char: "你", strokes: 7, completed: false },
+            { char: "他", strokes: 5, completed: false }
+        ];
+        let currentIndex = 0;
+        let isDrawing = false;
+        let strokeCount = 0;
+
+        // --- 雲端同步邏輯 ---
+        async function cloudSync(action, payload = null) {
+            const userId = localStorage.getItem('writing_username');
+            if (!userId || !GAS_URL.startsWith("http")) return;
+
+            syncStatus.classList.add('show');
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action, userId, payload })
+                });
+                const result = await response.json();
+                syncStatus.classList.remove('show');
+                return result.data;
+            } catch (e) {
+                console.error("同步失敗", e);
+                syncStatus.classList.remove('show');
+            }
+        }
+
+        async function saveProgress() {
+            localStorage.setItem('writing_characters', JSON.stringify(characters));
+            localStorage.setItem('writing_current_index', currentIndex);
+            await cloudSync("save", { characters, currentIndex });
+        }
+
+        async function initApp() {
+            const savedName = localStorage.getItem('writing_username');
+            if (!savedName) {
+                document.getElementById('user-modal').classList.add('active');
+            } else {
+                displayUsername.innerText = savedName;
+                const cloudData = await cloudSync("load");
+                if (cloudData) {
+                    characters = cloudData.characters;
+                    currentIndex = cloudData.currentIndex;
+                }
+                renderSteps();
+                setupCanvasSize();
+            }
+        }
+
+        document.getElementById('confirm-user').onclick = async () => {
+            const name = document.getElementById('username-input').value.trim();
+            if (name) {
+                localStorage.setItem('writing_username', name);
+                location.reload();
+            }
+        };
+
+        function renderSteps() {
+            stepContainer.innerHTML = '';
+            let completedCount = 0;
+            
+            characters.forEach((item, i) => {
+                const btn = document.createElement('button');
+                btn.className = `step-btn relative flex-none w-12 h-12 rounded-xl bg-white chinese-font font-bold text-xl shadow-sm ${i === currentIndex ? 'active' : 'text-slate-400'}`;
+                if (item.completed) {
+                    btn.classList.add('completed');
+                    completedCount++;
+                }
+                btn.innerText = item.char;
+                btn.onclick = () => { currentIndex = i; renderSteps(); clearCanvas(); };
+                stepContainer.appendChild(btn);
+            });
+
+            // 更新進度條動畫
+            const progressPercent = (completedCount / characters.length) * 100;
+            progressFill.style.width = `${progressPercent}%`;
+            progressChar.style.left = `${progressPercent}%`;
+            progressText.innerText = `正在練習第 ${currentIndex + 1} / ${characters.length} 個漢字`;
+
+            watermark.innerText = characters[currentIndex].char;
+            document.getElementById('target-stroke').innerText = "/ " + characters[currentIndex].strokes;
+            updateReference();
+        }
+
+        // --- 畫布邏輯 ---
+        function setupCanvasSize() {
+            const size = canvas.parentElement.clientWidth;
+            if (size <= 0) return;
+            canvas.width = canvas.height = size;
+            refCanvas.width = refCanvas.height = size;
+            ctx.lineCap = 'round';
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = '#1e293b';
+            updateReference();
+        }
+
+        function updateReference() {
+            const size = canvas.width;
+            refCtx.clearRect(0,0,size,size);
+            refCtx.font = `${size*0.8}px 'Klee One'`;
+            refCtx.textAlign = 'center';
+            refCtx.textBaseline = 'middle';
+            refCtx.fillText(characters[currentIndex].char, size/2, size/2);
+        }
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            strokeCount++;
+            document.getElementById('stroke-count').innerText = strokeCount;
+            const rect = canvas.getBoundingClientRect();
+            ctx.beginPath();
+            ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+            ctx.stroke();
+        });
+
+        canvas.addEventListener('touchend', () => {
+            isDrawing = false;
+            checkCompletion();
+        });
+
+        function checkCompletion() {
+            if (strokeCount === characters[currentIndex].strokes) {
+                characters[currentIndex].completed = true;
+                saveProgress();
+                renderSteps();
+            }
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            strokeCount = 0;
+            document.getElementById('stroke-count').innerText = "0";
+        }
+
+        document.getElementById('clear-btn').onclick = clearCanvas;
+        window.onload = initApp;
+        window.onresize = setupCanvasSize;
+    </script>
+</body>
+</html>
