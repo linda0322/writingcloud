@@ -283,7 +283,7 @@
             const progressPercent = (completedCount / characters.length) * 100;
             progressFill.style.width = `${progressPercent}%`;
             progressChar.style.left = `${progressPercent}%`;
-            progressText.innerText = `學習進度：${completedCount} / ${characters.length} (正在練習「${characters[currentIndex].char}」)`;
+            progressText.innerText = `學習進度：${completedCount}`;
 
             // 更新 HTML 層浮水印 (Klee One)
             watermark.innerText = characters[currentIndex].char;
