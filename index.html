@@ -166,8 +166,10 @@
         <div class="bg-white p-8 rounded-[35px] shadow-2xl w-full max-w-xs text-center">
             <h3 class="font-bold text-slate-700 mb-4">加入新字</h3>
             <div class="space-y-4">
-                <input type="text" id="custom-char-input" maxlength="1" placeholder="字" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400">
-                <input type="number" id="custom-stroke-input" placeholder="筆劃" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400">
+                <div class="flex gap-2">
+                    <input type="text" id="custom-char-input" maxlength="1" placeholder="字" class="flex-[2] border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400">
+                    <input type="number" id="custom-stroke-input" placeholder="筆劃" class="flex-[3] border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400">
+                </div>
                 <div class="flex gap-2">
                     <button id="cancel-custom" class="flex-1 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold">取消</button>
                     <button id="save-custom" class="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-100">加入</button>
@@ -294,8 +296,8 @@
 
         function updateReference() {
             const size = canvas.width;
+            if (size <= 0) return;
             refCtx.clearRect(0,0,size,size);
-            // 這裡依然繪製，但 refCanvas 元素在 CSS 設為 opacity: 0，所以使用者看不到，解決重疊問題
             refCtx.fillStyle = "black";
             refCtx.font = `${size*0.8}px 'Klee One'`;
             refCtx.textAlign = 'center';
