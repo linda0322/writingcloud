@@ -397,6 +397,41 @@
             }
         }
 
+        function calculateScore() {
+            const size = canvas.width;
+            if (size <= 0) return;
+            const drawData = ctx.getImageData(0, 0, size, size).data;
+            const refData = refCtx.getImageData(0, 0, size, size).data;
+            let refPixels = 0, matchedPixels = 0, wrongPixels = 0;
+            for (let i = 3; i < drawData.length; i += 16) {
+                const isDrawn = drawData[i] > 20;
+                const isRef = refData[i] > 20;
+                if (isRef) refPixels++;
+                if (isDrawn && isRef) matchedPixels++;
+                if (isDrawn && !isRef) wrongPixels++;
+            }
+            const completion = (matchedPixels / (refPixels || 1)) * 100;
+            let internalScore = (completion * 3.5) - ((wrongPixels / (refPixels || 1)) * 8);
+            const isShapeCorrect = internalScore >= 35;
+            const isStrokesCorrect = strokeCount === characters[currentIndex].strokes;
+            
+            if (isShapeCorrect && isStrokesCorrect) {
+                successTick.classList.add('show');
+                characters[currentIndex].completed = true;
+                saveData(); // 成功完成一個字，存檔
+                updateCurrentUI(); 
+                if (currentIndex < characters.length - 1) {
+                    autoNextTimeout = setTimeout(() => {
+                        autoNextTimeout = null;
+                        selectStep(currentIndex + 1);
+                    }, 1200);
+                }
+            } else {
+                successTick.classList.remove('show');
+            }
+        }
+
+
         function clearCanvas() { paths = []; ctx.clearRect(0, 0, canvas.width, canvas.height); document.getElementById('stroke-count').innerText = "0"; }
         function undo() { if (paths.length > 0) { paths.pop(); redrawCanvas(); document.getElementById('stroke-count').innerText = paths.length; if (characters[currentIndex].completed) { characters[currentIndex].completed = false; saveProgress(); renderSteps(); } } }
 
