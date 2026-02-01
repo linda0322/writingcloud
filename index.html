@@ -161,19 +161,17 @@
         </div>
     </div>
 
-    <!-- 自訂漢字視窗 -->
+    <!-- 自訂漢字彈窗 -->
     <div id="custom-modal" class="modal-overlay">
-        <div class="bg-white p-6 rounded-3xl shadow-2xl w-full max-w-xs scale-in">
-            <h3 class="text-lg font-bold text-slate-800 mb-4 text-center">輸入新字</h3>
-            <div class="flex justify-center gap-2 mb-4">
-                <input type="text" id="custom-char-input" maxlength="1" placeholder="漢字" 
-                    class="w-20 border-2 border-slate-100 rounded-xl px-1 py-3 text-center text-xl font-bold focus:border-blue-400 outline-none placeholder:text-slate-300 placeholder:text-sm">
-                <input type="number" id="custom-stroke-input" placeholder="筆劃" 
-                    class="w-20 border-2 border-slate-100 rounded-xl px-1 py-3 text-center text-lg font-bold focus:border-blue-400 outline-none placeholder:text-slate-300 placeholder:text-sm">
-            </div>
-            <div class="flex gap-2">
-                <button id="cancel-custom" class="flex-1 py-3 text-slate-400 font-bold">取消</button>
-                <button id="confirm-custom" class="flex-1 py-3 bg-[#38C0FF] text-white rounded-xl font-bold shadow-lg shadow-[#38C0FF]/20">開始</button>
+        <div class="bg-white p-8 rounded-[35px] shadow-2xl w-full max-w-xs text-center">
+            <h3 class="font-bold text-slate-700 mb-4">加入新字</h3>
+            <div class="space-y-4">
+                <input type="text" id="custom-char-input" maxlength="1" placeholder="字" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400">
+                <input type="number" id="custom-stroke-input" placeholder="筆劃" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400">
+                <div class="flex gap-2">
+                    <button id="cancel-custom" class="flex-1 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold">取消</button>
+                    <button id="save-custom" class="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-100">加入</button>
+                </div>
             </div>
         </div>
     </div>
