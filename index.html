@@ -154,7 +154,7 @@
     <div id="user-modal" class="modal-overlay">
         <div class="bg-white p-8 rounded-[40px] shadow-2xl w-full max-w-xs text-center flex flex-col items-center">
             <img src="https://raw.githubusercontent.com/linda0322/writingcloud/refs/heads/main/Robot.gif" alt="機器人" class="w-24 h-24 mb-6">
-            <h2 class="text-xl font-bold text-slate-700 mb-4">歡迎來到寫字練習</h2>
+            <h2 class="text-xl font-bold text-slate-700 mb-4">登入</h2>
             <input type="text" id="username-input" placeholder="請輸入你的名字" class="w-full border-2 border-slate-100 rounded-2xl px-4 py-4 text-center font-bold mb-6 outline-none focus:border-[#38C0FF]">
             <button id="confirm-user" class="w-full py-4 bg-[#38C0FF] text-white rounded-2xl font-bold shadow-lg shadow-blue-200">開始練習</button>
         </div>
@@ -263,7 +263,7 @@
         }
 
         function logout() {
-            if(confirm("確定要登出嗎？登出後將清除本機暫存，下次需重新由雲端下載。")) {
+            if(confirm("確定要登出嗎？")) {
                 localStorage.clear();
                 location.reload();
             }
