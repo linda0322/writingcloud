@@ -21,8 +21,9 @@
         .chinese-font { font-family: 'Klee One', "BiauKai", serif; }
         .canvas-container { position: relative; background-color: white; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; }
-        #ref-canvas { position: absolute; top: 0; left: 0; z-index: 5; opacity: 0.1; pointer-events: none; }
-        #watermark-layer { position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center; font-size: min(70vw, 300px); color: #f1f3f5; pointer-events: none; }
+        /* 隱藏參考畫布的視覺呈現，僅保留邏輯或極低透明度 */
+        #ref-canvas { position: absolute; top: 0; left: 0; z-index: 5; opacity: 0; pointer-events: none; }
+        #watermark-layer { position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center; font-size: min(70vw, 300px); color: rgba(0,0,0,0.05); pointer-events: none; }
         
         #success-tick {
             position: absolute;
@@ -133,6 +134,7 @@
                     <path d="M8 12L11 15L16 9" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
+            <!-- 這裡是唯一顯示 Klee One 字體的層 -->
             <div id="watermark-layer" class="chinese-font"></div>
             <canvas id="drawing-canvas"></canvas>
             <canvas id="ref-canvas"></canvas>
@@ -205,7 +207,6 @@
         let isDrawing = false;
         let paths = []; 
 
-        // --- 核心邏輯：支援讀取與儲存 ---
         async function cloudAction(action, payload = null) {
             const userId = localStorage.getItem('writing_username');
             if (!userId || !GAS_URL.startsWith("http")) return null;
@@ -214,7 +215,6 @@
             syncStatus.classList.add('show');
             
             try {
-                // 使用 POST 因為 GAS 的 doGet 有限制
                 const response = await fetch(GAS_URL, { 
                     method: "POST", 
                     body: JSON.stringify({ action, userId, payload }) 
@@ -241,26 +241,21 @@
                 document.getElementById('user-modal').classList.add('active');
             } else {
                 displayUsername.innerText = savedName;
-                
-                // 優先嘗試從雲端抓取進度
                 const cloudDataStr = await cloudAction("load");
                 if (cloudDataStr && cloudDataStr !== "NoData" && cloudDataStr !== "Error") {
                     try {
                         const cloudData = JSON.parse(cloudDataStr);
                         characters = cloudData.characters;
                         currentIndex = cloudData.currentIndex;
-                        // 同步更新到本地緩存
                         localStorage.setItem('writing_characters', JSON.stringify(characters));
                         localStorage.setItem('writing_current_index', currentIndex);
                     } catch(e) { console.log("JSON Parse Error"); }
                 } else {
-                    // 如果雲端沒資料，才用本地或預設
                     const localChars = localStorage.getItem('writing_characters');
                     const localIndex = localStorage.getItem('writing_current_index');
                     if (localChars) characters = JSON.parse(localChars);
                     if (localIndex) currentIndex = parseInt(localIndex);
                 }
-                
                 renderSteps();
                 setupCanvasSize();
             }
@@ -290,6 +285,7 @@
             progressChar.style.left = `${progressPercent}%`;
             progressText.innerText = `學習進度：${completedCount} / ${characters.length} (正在練習「${characters[currentIndex].char}」)`;
 
+            // 更新 HTML 層浮水印 (Klee One)
             watermark.innerText = characters[currentIndex].char;
             document.getElementById('target-stroke').innerText = "/ " + characters[currentIndex].strokes;
             document.getElementById('stroke-count').innerText = paths.length;
@@ -299,7 +295,8 @@
         function updateReference() {
             const size = canvas.width;
             refCtx.clearRect(0,0,size,size);
-            refCtx.fillStyle = "rgba(0,0,0,0.1)";
+            // 這裡依然繪製，但 refCanvas 元素在 CSS 設為 opacity: 0，所以使用者看不到，解決重疊問題
+            refCtx.fillStyle = "black";
             refCtx.font = `${size*0.8}px 'Klee One'`;
             refCtx.textAlign = 'center';
             refCtx.textBaseline = 'middle';
@@ -317,7 +314,6 @@
             updateReference();
         }
 
-        // --- 繪圖邏輯 ---
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
             let clientX, clientY;
@@ -403,7 +399,6 @@
         function clearCanvas() { paths = []; ctx.clearRect(0, 0, canvas.width, canvas.height); document.getElementById('stroke-count').innerText = "0"; }
         function undo() { if (paths.length > 0) { paths.pop(); redrawCanvas(); document.getElementById('stroke-count').innerText = paths.length; if (characters[currentIndex].completed) { characters[currentIndex].completed = false; saveProgress(); renderSteps(); } } }
 
-        // --- 彈窗與按鈕監聽 ---
         document.getElementById('logout-btn').onclick = logout;
         document.getElementById('custom-trigger-btn').onclick = () => document.getElementById('custom-modal').classList.add('active');
         document.getElementById('cancel-custom').onclick = () => document.getElementById('custom-modal').classList.remove('active');
