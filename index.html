@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>寫字練習</title>
+    <title>寫字練習 - 結構偵錯版</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/linda0322/writingcloud/refs/heads/main/Icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
@@ -75,7 +75,6 @@
         button:active { transform: scale(0.95); transition: transform 0.1s; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-        /* 載入中動畫 */
         .loading-dots:after { content: '.'; animation: dots 1s steps(5, end) infinite; }
         @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60% { content: '...'; } 80%, 100% { content: ''; } }
     </style>
@@ -88,7 +87,6 @@
     </div>
 
     <main class="w-full max-w-md">
-        <!-- 學生資訊 -->
         <div class="mb-4 px-1 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <div class="glass-panel px-4 py-1.5 rounded-full shadow-md flex items-center gap-2">
@@ -104,7 +102,6 @@
             </button>
         </div>
 
-        <!-- 操作欄 -->
         <div class="flex justify-between items-center mb-6 px-1">
             <div class="flex items-center gap-3 glass-panel px-4 py-2 rounded-full shadow-lg">
                 <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">筆劃數</span>
@@ -125,7 +122,6 @@
             </div>
         </div>
 
-        <!-- 畫布 -->
         <div class="canvas-container aspect-square w-full rounded-3xl overflow-hidden mb-8 border-2 border-white/50">
             <div id="success-tick">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -133,13 +129,11 @@
                     <path d="M8 12L11 15L16 9" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
-            <!-- 這裡是唯一顯示 Klee One 字體的層 -->
             <div id="watermark-layer" class="chinese-font"></div>
             <canvas id="drawing-canvas"></canvas>
             <canvas id="ref-canvas"></canvas>
         </div>
 
-        <!-- 進度條與列表 -->
         <div class="glass-panel p-5 rounded-3xl shadow-xl">
             <div id="progress-text" class="text-[11px] text-slate-500 font-bold mb-2 text-center">正在準備練習...</div>
             <div class="progress-bar-container">
@@ -150,7 +144,6 @@
         </div>
     </main>
 
-    <!-- 登入彈窗 -->
     <div id="user-modal" class="modal-overlay">
         <div class="bg-white p-8 rounded-[40px] shadow-2xl w-full max-w-xs text-center flex flex-col items-center">
             <img src="https://raw.githubusercontent.com/linda0322/writingcloud/refs/heads/main/Robot.gif" alt="機器人" class="w-24 h-24 mb-6">
@@ -160,14 +153,13 @@
         </div>
     </div>
 
-    <!-- 自訂漢字視窗 -->
     <div id="custom-modal" class="modal-overlay">
         <div class="bg-white p-8 rounded-[35px] shadow-2xl w-full max-w-xs text-center">
             <h3 class="font-bold text-slate-700 mb-4">加入新字</h3>
             <div class="space-y-4">
                 <div class="flex justify-center gap-2 mb-4">
-                    <input type="text" id="custom-char-input" maxlength="1" placeholder="字" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm"">
-                    <input type="number" id="custom-stroke-input" placeholder="筆劃" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm"">
+                    <input type="text" id="custom-char-input" maxlength="1" placeholder="字" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm">
+                    <input type="number" id="custom-stroke-input" placeholder="筆劃" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm">
                 </div>
                 <div class="flex gap-2">
                     <button id="cancel-custom" class="flex-1 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold">取消</button>
@@ -211,10 +203,8 @@
         async function cloudAction(action, payload = null) {
             const userId = localStorage.getItem('writing_username');
             if (!userId || !GAS_URL.startsWith("http")) return null;
-            
             syncText.innerText = action === "load" ? "正在讀取雲端進度..." : "雲端同步中...";
             syncStatus.classList.add('show');
-            
             try {
                 const response = await fetch(GAS_URL, { 
                     method: "POST", 
@@ -248,8 +238,6 @@
                         const cloudData = JSON.parse(cloudDataStr);
                         characters = cloudData.characters;
                         currentIndex = cloudData.currentIndex;
-                        localStorage.setItem('writing_characters', JSON.stringify(characters));
-                        localStorage.setItem('writing_current_index', currentIndex);
                     } catch(e) { console.log("JSON Parse Error"); }
                 } else {
                     const localChars = localStorage.getItem('writing_characters');
@@ -262,13 +250,6 @@
             }
         }
 
-        function logout() {
-            if(confirm("確定要登出嗎？")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
         function renderSteps() {
             stepContainer.innerHTML = '';
             let completedCount = 0;
@@ -277,7 +258,7 @@
                 btn.className = `step-btn relative flex-none w-12 h-12 rounded-2xl bg-white chinese-font font-bold text-xl shadow-sm border-2 transition-all ${i === currentIndex ? 'active border-blue-200' : 'text-slate-400 border-transparent'}`;
                 if (item.completed) { btn.classList.add('completed'); completedCount++; }
                 btn.innerText = item.char;
-                btn.onclick = () => { currentIndex = i; renderSteps(); clearCanvas(); };
+                btn.onclick = () => { currentIndex = i; clearCanvas(); renderSteps(); };
                 stepContainer.appendChild(btn);
             });
 
@@ -286,7 +267,6 @@
             progressChar.style.left = `${progressPercent}%`;
             progressText.innerText = `學習進度：${completedCount}`;
 
-            // 更新 HTML 層浮水印 (Klee One)
             watermark.innerText = characters[currentIndex].char;
             document.getElementById('target-stroke').innerText = "/ " + characters[currentIndex].strokes;
             document.getElementById('stroke-count').innerText = paths.length;
@@ -309,7 +289,7 @@
             if (size <= 0) return;
             canvas.width = canvas.height = refCanvas.width = refCanvas.height = size;
             ctx.lineCap = ctx.lineJoin = 'round';
-            ctx.lineWidth = size * 0.045; 
+            ctx.lineWidth = size * 0.05; // 稍微加粗一點利於偵測
             ctx.strokeStyle = '#1e293b';
             redrawCanvas();
             updateReference();
@@ -319,11 +299,9 @@
             const rect = canvas.getBoundingClientRect();
             let clientX, clientY;
             if (e.touches && e.touches.length > 0) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
+                clientX = e.touches[0].clientX; clientY = e.touches[0].clientY;
             } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
+                clientX = e.clientX; clientY = e.clientY;
             }
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
@@ -348,23 +326,14 @@
             if (!isDrawing) return;
             isDrawing = false;
             document.getElementById('stroke-count').innerText = paths.length;
-            checkCompletion();
+            checkCompletion(); // 放開手時檢查
         }
 
         canvas.addEventListener('mousedown', handleStart);
         canvas.addEventListener('mousemove', handleMove);
         window.addEventListener('mouseup', handleEnd);
-
-        canvas.addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            handleStart(e); 
-        }, { passive: false });
-        
-        canvas.addEventListener('touchmove', (e) => { 
-            e.preventDefault(); 
-            handleMove(e); 
-        }, { passive: false });
-        
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleStart(e); }, { passive: false });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); handleMove(e); }, { passive: false });
         canvas.addEventListener('touchend', handleEnd);
 
         function redrawCanvas() {
@@ -377,65 +346,71 @@
             });
         }
 
+        // 核心偵錯邏輯
         function checkCompletion() {
             const target = characters[currentIndex].strokes;
-            if (paths.length === target) {
-                characters[currentIndex].completed = true;
-                successTick.classList.add('show');
-                saveProgress();
-                renderSteps();
-                
-                setTimeout(() => {
-                    successTick.classList.remove('show');
-                    const next = characters.findIndex((c, i) => !c.completed && i > currentIndex);
-                    const first = characters.findIndex(c => !c.completed);
-                    if (next !== -1) currentIndex = next;
-                    else if (first !== -1) currentIndex = first;
-                    clearCanvas();
-                    renderSteps();
-                }, 1200);
-            }
-        }
-
-        function calculateScore() {
-            const size = canvas.width;
-            if (size <= 0) return;
-            const drawData = ctx.getImageData(0, 0, size, size).data;
-            const refData = refCtx.getImageData(0, 0, size, size).data;
-            let refPixels = 0, matchedPixels = 0, wrongPixels = 0;
-            for (let i = 3; i < drawData.length; i += 16) {
-                const isDrawn = drawData[i] > 20;
-                const isRef = refData[i] > 20;
-                if (isRef) refPixels++;
-                if (isDrawn && isRef) matchedPixels++;
-                if (isDrawn && !isRef) wrongPixels++;
-            }
-            const completion = (matchedPixels / (refPixels || 1)) * 100;
-            let internalScore = (completion * 3.5) - ((wrongPixels / (refPixels || 1)) * 8);
-            const isShapeCorrect = internalScore >= 35;
-            const isStrokesCorrect = strokeCount === characters[currentIndex].strokes;
+            const currentStrokes = paths.length;
             
-            if (isShapeCorrect && isStrokesCorrect) {
-                successTick.classList.add('show');
-                characters[currentIndex].completed = true;
-                saveData(); // 成功完成一個字，存檔
-                updateCurrentUI(); 
-                if (currentIndex < characters.length - 1) {
-                    autoNextTimeout = setTimeout(() => {
-                        autoNextTimeout = null;
-                        selectStep(currentIndex + 1);
-                    }, 1200);
+            // 只有筆劃數對了，才進行昂貴的結構檢查
+            if (currentStrokes === target) {
+                const size = canvas.width;
+                const drawData = ctx.getImageData(0, 0, size, size).data;
+                const refData = refCtx.getImageData(0, 0, size, size).data;
+                
+                let refPixels = 0, matchedPixels = 0, wrongPixels = 0;
+                
+                // 每隔 16 個像素抽查（優化效能）
+                for (let i = 3; i < drawData.length; i += 16) {
+                    const isDrawn = drawData[i] > 20;
+                    const isRef = refData[i] > 20;
+                    if (isRef) refPixels++;
+                    if (isDrawn && isRef) matchedPixels++;
+                    if (isDrawn && !isRef) wrongPixels++;
                 }
-            } else {
-                successTick.classList.remove('show');
+                
+                const completion = (matchedPixels / (refPixels || 1)) * 100;
+                const internalScore = (completion * 3.5) - ((wrongPixels / (refPixels || 1)) * 8);
+                
+                // 結構門檻 35
+                if (internalScore >= 35) {
+                    handleSuccess();
+                }
             }
         }
 
+        function handleSuccess() {
+            characters[currentIndex].completed = true;
+            successTick.classList.add('show');
+            saveProgress();
+            renderSteps();
+            
+            setTimeout(() => {
+                successTick.classList.remove('show');
+                const next = characters.findIndex((c, i) => !c.completed && i > currentIndex);
+                const first = characters.findIndex(c => !c.completed);
+                if (next !== -1) currentIndex = next;
+                else if (first !== -1) currentIndex = first;
+                clearCanvas();
+                renderSteps();
+            }, 1200);
+        }
 
         function clearCanvas() { paths = []; ctx.clearRect(0, 0, canvas.width, canvas.height); document.getElementById('stroke-count').innerText = "0"; }
-        function undo() { if (paths.length > 0) { paths.pop(); redrawCanvas(); document.getElementById('stroke-count').innerText = paths.length; if (characters[currentIndex].completed) { characters[currentIndex].completed = false; saveProgress(); renderSteps(); } } }
+        
+        function undo() { 
+            if (paths.length > 0) { 
+                paths.pop(); 
+                redrawCanvas(); 
+                document.getElementById('stroke-count').innerText = paths.length; 
+                if (characters[currentIndex].completed) { 
+                    characters[currentIndex].completed = false; 
+                    saveProgress(); 
+                    renderSteps(); 
+                } 
+            } 
+        }
 
-        document.getElementById('logout-btn').onclick = logout;
+        document.getElementById('logout-btn').onclick = () => { if(confirm("確定要登出嗎？")) { localStorage.clear(); location.reload(); } };
         document.getElementById('custom-trigger-btn').onclick = () => document.getElementById('custom-modal').classList.add('active');
         document.getElementById('cancel-custom').onclick = () => document.getElementById('custom-modal').classList.remove('active');
         document.getElementById('save-custom').onclick = () => {
@@ -446,8 +421,7 @@
                 document.getElementById('custom-modal').classList.remove('active');
                 document.getElementById('custom-char-input').value = "";
                 document.getElementById('custom-stroke-input').value = "";
-                saveProgress();
-                renderSteps();
+                saveProgress(); renderSteps();
             }
         };
 
