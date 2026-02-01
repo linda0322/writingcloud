@@ -34,16 +34,45 @@
             pointer-events: none;
         }
         #success-tick.show { transform: translate(-50%, -50%) scale(1.5); }
+
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
         .step-btn.active { background-color: #38C0FF; color: white; border-color: white; }
         .step-btn.completed::after { content: '✓'; position: absolute; top: -2px; right: -2px; background: #10B981; color: white; width: 14px; height: 14px; border-radius: 50%; font-size: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid white; }
-        .progress-bar-container { position: relative; width: 100%; height: 10px; background-color: rgba(255, 255, 255, 0.5); border-radius: 5px; margin-bottom: 25px; margin-top: 15px; }
-        #progress-fill { height: 100%; background-color: #10B981; width: 0%; transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 5px; }
-        #progress-character { position: absolute; bottom: 8px; left: 0%; width: 40px; height: 40px; transform: translateX(-50%); transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; z-index: 20; }
+        
+        .progress-bar-container {
+            position: relative;
+            width: 100%;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            margin-bottom: 25px;
+            margin-top: 15px;
+        }
+        #progress-fill {
+            height: 100%;
+            background-color: #10B981;
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 5px;
+        }
+        #progress-character {
+            position: absolute;
+            bottom: 8px;
+            left: 0%;
+            width: 40px;
+            height: 40px;
+            transform: translateX(-50%);
+            transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            z-index: 20;
+        }
+
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
         .modal-overlay.active { display: flex; }
         #sync-status { transition: opacity 0.3s; opacity: 0; }
         #sync-status.show { opacity: 1; }
+        
+        button:active { transform: scale(0.95); transition: transform 0.1s; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -55,21 +84,23 @@
     </div>
 
     <main class="w-full max-w-md">
+        <!-- 學生資訊 -->
         <div class="mb-4 px-1 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <div class="glass-panel px-4 py-1.5 rounded-full shadow-md flex items-center gap-2">
                     <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">學生</span>
                     <span id="display-username" class="text-sm font-bold text-slate-700">載入中...</span>
                 </div>
-                <button id="logout-btn" class="p-2 glass-panel rounded-full text-red-500 active:scale-90 transition-all">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <button id="logout-btn" class="p-2 glass-panel rounded-full text-red-500 hover:bg-white/50 active:scale-90 transition-all" title="登出並清除本地進度">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 </button>
             </div>
-            <button onclick="location.reload()" class="p-2 glass-panel rounded-full text-slate-500">
+            <button onclick="location.reload()" class="p-2 glass-panel rounded-full text-slate-500 hover:bg-white/50">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
             </button>
         </div>
 
+        <!-- 操作欄 -->
         <div class="flex justify-between items-center mb-6 px-1">
             <div class="flex items-center gap-3 glass-panel px-4 py-2 rounded-full shadow-lg">
                 <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">筆劃數</span>
@@ -78,16 +109,19 @@
             </div>
             
             <div class="flex gap-2">
-                <button id="undo-btn" class="p-2 glass-panel text-slate-600 rounded-full shadow-lg active:scale-95">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+                <button id="undo-btn" class="p-2 glass-panel text-slate-600 rounded-full hover:bg-white transition-colors shadow-lg active:scale-95" title="撤銷上一筆">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
                 </button>
-                <button id="custom-trigger-btn" class="p-2 glass-panel text-blue-600 rounded-full shadow-lg active:scale-95">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <button id="custom-trigger-btn" class="p-2 glass-panel text-blue-600 rounded-full hover:bg-white transition-colors shadow-lg active:scale-95" title="自訂漢字">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 </button>
-                <button id="clear-btn" class="px-4 py-2 glass-panel text-slate-600 rounded-full font-bold text-xs shadow-lg active:scale-95">清除</button>
+                <button id="clear-btn" class="px-4 py-2 glass-panel text-slate-600 rounded-full hover:bg-white transition-colors font-bold text-xs shadow-lg active:scale-95">
+                    清除
+                </button>
             </div>
         </div>
 
+        <!-- 畫布 -->
         <div class="canvas-container aspect-square w-full rounded-3xl overflow-hidden mb-8 border-2 border-white/50">
             <div id="success-tick">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -100,6 +134,7 @@
             <canvas id="ref-canvas"></canvas>
         </div>
 
+        <!-- 進度條與列表 -->
         <div class="glass-panel p-5 rounded-3xl shadow-xl">
             <div id="progress-text" class="text-[11px] text-slate-500 font-bold mb-2 text-center">正在準備練習...</div>
             <div class="progress-bar-container">
@@ -110,22 +145,24 @@
         </div>
     </main>
 
+    <!-- 登入彈窗 -->
     <div id="user-modal" class="modal-overlay">
         <div class="bg-white p-8 rounded-[40px] shadow-2xl w-full max-w-xs text-center flex flex-col items-center">
             <img src="https://raw.githubusercontent.com/linda0322/writingcloud/refs/heads/main/Robot.gif" alt="機器人" class="w-24 h-24 mb-6">
             <h2 class="text-xl font-bold text-slate-700 mb-4">登入</h2>
             <input type="text" id="username-input" placeholder="請輸入你的名字" class="w-full border-2 border-slate-100 rounded-2xl px-4 py-4 text-center font-bold mb-6 outline-none focus:border-[#38C0FF]">
-            <button id="confirm-user" class="w-full py-4 bg-[#38C0FF] text-white rounded-2xl font-bold">開始練習</button>
+            <button id="confirm-user" class="w-full py-4 bg-[#38C0FF] text-white rounded-2xl font-bold shadow-lg shadow-blue-200">開始練習</button>
         </div>
     </div>
 
+    <!-- 自訂漢字視窗 -->
     <div id="custom-modal" class="modal-overlay">
         <div class="bg-white p-8 rounded-[35px] shadow-2xl w-full max-w-xs text-center">
             <h3 class="font-bold text-slate-700 mb-4">加入新字</h3>
             <div class="space-y-4">
                 <div class="flex justify-center gap-2 mb-4">
-                    <input type="text" id="custom-char-input" maxlength="1" placeholder="字" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold">
-                    <input type="number" id="custom-stroke-input" placeholder="筆劃" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold">
+                    <input type="text" id="custom-char-input" maxlength="1" placeholder="字" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm">
+                    <input type="number" id="custom-stroke-input" placeholder="筆劃" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm">
                 </div>
                 <div class="flex gap-2">
                     <button id="cancel-custom" class="flex-1 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold">取消</button>
@@ -137,8 +174,9 @@
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzJnjgmToB2wH9jgri2IP04l34k_cqLGad6EqKHjKVq6w3_bx7dxZz88c7nOZt_2oQZ/exec"; 
+        
         const canvas = document.getElementById('drawing-canvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { desynchronized: true });
         const refCanvas = document.getElementById('ref-canvas');
         const refCtx = refCanvas.getContext('2d');
         const watermark = document.getElementById('watermark-layer');
@@ -151,7 +189,7 @@
         const progressText = document.getElementById('progress-text');
         const successTick = document.getElementById('success-tick');
         
-        let characters = [
+        const defaultCharacters = [
             { char: "我", strokes: 7, completed: false },
             { char: "你", strokes: 7, completed: false },
             { char: "他", strokes: 5, completed: false },
@@ -159,20 +197,28 @@
             { char: "學", strokes: 16, completed: false },
             { char: "習", strokes: 11, completed: false }
         ];
+
+        let characters = [...defaultCharacters];
         let currentIndex = 0;
         let isDrawing = false;
         let paths = []; 
 
         async function cloudAction(action, payload = null) {
             const userId = localStorage.getItem('writing_username');
-            if (!userId) return null;
+            if (!userId || !GAS_URL.startsWith("http")) return null;
             syncStatus.classList.add('show');
             try {
-                const response = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action, userId, payload }) });
+                const response = await fetch(GAS_URL, { 
+                    method: "POST", 
+                    body: JSON.stringify({ action, userId, payload }) 
+                });
                 const result = await response.text();
                 syncStatus.classList.remove('show');
                 return result;
-            } catch (e) { syncStatus.classList.remove('show'); return null; }
+            } catch (e) { 
+                syncStatus.classList.remove('show');
+                return null;
+            }
         }
 
         async function saveProgress() {
@@ -189,12 +235,16 @@
                 displayUsername.innerText = savedName;
                 const cloudDataStr = await cloudAction("load");
                 if (cloudDataStr && cloudDataStr !== "NoData" && cloudDataStr !== "Error") {
-                    const cloudData = JSON.parse(cloudDataStr);
-                    characters = cloudData.characters;
-                    currentIndex = cloudData.currentIndex;
+                    try {
+                        const cloudData = JSON.parse(cloudDataStr);
+                        characters = cloudData.characters;
+                        currentIndex = cloudData.currentIndex;
+                    } catch(e) {}
                 } else {
                     const localChars = localStorage.getItem('writing_characters');
+                    const localIndex = localStorage.getItem('writing_current_index');
                     if (localChars) characters = JSON.parse(localChars);
+                    if (localIndex) currentIndex = parseInt(localIndex);
                 }
                 renderSteps();
                 setupCanvasSize();
@@ -225,12 +275,15 @@
         function updateReference() {
             const size = canvas.width;
             if (size <= 0) return;
-            refCtx.clearRect(0,0,size,size);
-            refCtx.fillStyle = "black";
-            refCtx.font = `${size*0.8}px 'Klee One'`;
-            refCtx.textAlign = 'center';
-            refCtx.textBaseline = 'middle';
-            refCtx.fillText(characters[currentIndex].char, size/2, size/2);
+            // 確保字體載入
+            document.fonts.load(`1em "Klee One"`).then(() => {
+                refCtx.clearRect(0,0,size,size);
+                refCtx.fillStyle = "black";
+                refCtx.font = `${size*0.75}px 'Klee One'`; // 調整比例使其與浮水印一致
+                refCtx.textAlign = 'center';
+                refCtx.textBaseline = 'middle';
+                refCtx.fillText(characters[currentIndex].char, size/2, size/2);
+            });
         }
 
         function setupCanvasSize() {
@@ -238,7 +291,7 @@
             if (size <= 0) return;
             canvas.width = canvas.height = refCanvas.width = refCanvas.height = size;
             ctx.lineCap = ctx.lineJoin = 'round';
-            ctx.lineWidth = size * 0.045; // 恢復標準粗細
+            ctx.lineWidth = size * 0.045; 
             ctx.strokeStyle = '#1e293b';
             redrawCanvas();
             updateReference();
@@ -246,8 +299,12 @@
 
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX; clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX; clientY = e.clientY;
+            }
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
@@ -255,14 +312,16 @@
             isDrawing = true;
             const pos = getPos(e);
             paths.push([pos]);
-            ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
         }
 
         function handleMove(e) {
             if (!isDrawing) return;
             const pos = getPos(e);
             paths[paths.length - 1].push(pos);
-            ctx.lineTo(pos.x, pos.y); ctx.stroke();
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
         }
 
         function handleEnd() {
@@ -289,69 +348,56 @@
             });
         }
 
-        // --- 核心改動：嚴格判斷機制 ---
         function checkCompletion() {
             const target = characters[currentIndex].strokes;
-            const currentStrokes = paths.length;
-            
-            // 如果筆劃數不對，絕對不給過
-            if (currentStrokes !== target) return;
-
+            const currentStrokeCount = paths.length;
             const size = canvas.width;
+            
+            // 1. 先抓取畫面數據
             const drawData = ctx.getImageData(0, 0, size, size).data;
             const refData = refCtx.getImageData(0, 0, size, size).data;
             
-            let refPixels = 0;      // 標準字總像素
-            let matchedPixels = 0;  // 學生寫在標準字內的像素
-            let wrongPixels = 0;    // 學生寫在空白處的像素
+            let refPixels = 0, matchedPixels = 0, wrongPixels = 0;
             
-            // 更精細的採樣 (i+=4 檢查每一個像素的 Alpha)
-            for (let i = 3; i < drawData.length; i += 4) {
+            // 2. 進行像素比對
+            for (let i = 3; i < drawData.length; i += 16) {
                 const isDrawn = drawData[i] > 30; // 學生畫的地方
-                const isRef = refData[i] > 30;   // 標準字的地方
+                const isRef = refData[i] > 30;   // 標準答案的地方
                 
                 if (isRef) refPixels++;
                 if (isDrawn && isRef) matchedPixels++;
                 if (isDrawn && !isRef) wrongPixels++;
             }
             
-            // 1. 覆蓋率 (學生寫了標準字的百分之幾？)
-            const completionRate = (matchedPixels / (refPixels || 1)) * 100;
-            // 2. 錯誤率 (學生寫錯的地方相對於標準字的大小比例)
-            const errorRate = (wrongPixels / (refPixels || 1)) * 100;
+            // 3. 計算分數
+            const completion = (matchedPixels / (refPixels || 1)) * 100;
+            const internalScore = (completion * 3.5) - ((wrongPixels / (refPixels || 1)) * 8);
             
-            // 嚴格公式：獎勵正確，重罰錯誤
-            // 分數 = (覆蓋率 * 1.5) - (錯誤率 * 2.5)
-            const score = (completionRate * 1.5) - (errorRate * 2.5);
-            
-            console.log(`Debug - 覆蓋率: ${completionRate.toFixed(1)}%, 錯誤率: ${errorRate.toFixed(1)}%, 總分: ${score.toFixed(1)}`);
-
-            // 門檻設定：分數必須大於 40 且 覆蓋率不能太低 (例如至少要有 30% 覆蓋)
-            if (score >= 40 && completionRate > 30) {
-                handleSuccess();
+            // 4. 同時滿足：筆劃數對了 + 結構分數及格 (35)
+            if (currentStrokeCount === target && internalScore >= 35) {
+                characters[currentIndex].completed = true;
+                successTick.classList.add('show');
+                saveProgress();
+                renderSteps();
+                
+                setTimeout(() => {
+                    successTick.classList.remove('show');
+                    const next = characters.findIndex((c, i) => !c.completed && i > currentIndex);
+                    const first = characters.findIndex(c => !c.completed);
+                    if (next !== -1) currentIndex = next;
+                    else if (first !== -1) currentIndex = first;
+                    clearCanvas();
+                    renderSteps();
+                }, 1200);
             }
-        }
-
-        function handleSuccess() {
-            characters[currentIndex].completed = true;
-            successTick.classList.add('show');
-            saveProgress();
-            renderSteps();
-            setTimeout(() => {
-                successTick.classList.remove('show');
-                const next = characters.findIndex((c, i) => !c.completed && i > currentIndex);
-                const first = characters.findIndex(c => !c.completed);
-                if (next !== -1) currentIndex = next;
-                else if (first !== -1) currentIndex = first;
-                clearCanvas(); renderSteps();
-            }, 1200);
         }
 
         function clearCanvas() { paths = []; ctx.clearRect(0, 0, canvas.width, canvas.height); document.getElementById('stroke-count').innerText = "0"; }
         function undo() { 
             if (paths.length > 0) { 
                 paths.pop(); redrawCanvas(); 
-                document.getElementById('stroke-count').innerText = paths.length;
+                document.getElementById('stroke-count').innerText = paths.length; 
+                if (characters[currentIndex].completed) { characters[currentIndex].completed = false; saveProgress(); renderSteps(); } 
             } 
         }
 
@@ -364,15 +410,19 @@
             if (char && stroke > 0) {
                 characters.push({ char, strokes: stroke, completed: false });
                 document.getElementById('custom-modal').classList.remove('active');
+                document.getElementById('custom-char-input').value = "";
+                document.getElementById('custom-stroke-input').value = "";
                 saveProgress(); renderSteps();
             }
         };
+
         document.getElementById('clear-btn').onclick = clearCanvas;
         document.getElementById('undo-btn').onclick = undo;
         document.getElementById('confirm-user').onclick = () => {
             const name = document.getElementById('username-input').value.trim();
             if (name) { localStorage.setItem('writing_username', name); location.reload(); }
         };
+
         window.onload = initApp;
         window.onresize = setupCanvasSize;
     </script>
