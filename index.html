@@ -252,8 +252,8 @@
             { char: "習", strokes: 11, completed: false }
         ];
 
-        // 完整字庫資料
-        const masterLibrary = [
+        // 完整字庫資料 (改為 let 讓它可以動態增加)
+        let masterLibrary = [
             { char: "一", strokes: 1 }, { char: "二", strokes: 2 }, { char: "三", strokes: 3 }, { char: "十", strokes: 2 },
             { char: "大", strokes: 3 }, { char: "小", strokes: 3 }, { char: "天", strokes: 4 }, { char: "人", strokes: 2 },
             { char: "口", strokes: 3 }, { char: "日", strokes: 4 }, { char: "月", strokes: 4 }, { char: "山", strokes: 3 },
@@ -302,6 +302,21 @@
                 document.getElementById('user-modal').classList.add('active');
             } else {
                 displayUsername.innerText = savedName;
+                
+                // 讀取自訂字庫 (圖鑑同步)
+                const savedCustomLibrary = localStorage.getItem('writing_custom_library');
+                if (savedCustomLibrary) {
+                    try {
+                        const customLib = JSON.parse(savedCustomLibrary);
+                        // 合併並去重
+                        customLib.forEach(item => {
+                            if (!masterLibrary.some(libItem => libItem.char === item.char)) {
+                                masterLibrary.push(item);
+                            }
+                        });
+                    } catch(e) {}
+                }
+
                 const cloudDataStr = await cloudAction("load");
                 if (cloudDataStr && cloudDataStr !== "NoData" && cloudDataStr !== "Error") {
                     try {
@@ -510,16 +525,30 @@
         document.getElementById('logout-btn').onclick = () => { if(confirm("確定要登出嗎？")) { localStorage.clear(); location.reload(); } };
         document.getElementById('custom-trigger-btn').onclick = () => document.getElementById('custom-modal').classList.add('active');
         document.getElementById('cancel-custom').onclick = () => document.getElementById('custom-modal').classList.remove('active');
+        
         document.getElementById('save-custom').onclick = () => {
             const char = document.getElementById('custom-char-input').value.trim();
             const stroke = parseInt(document.getElementById('custom-stroke-input').value);
             if (char && stroke > 0) {
+                // 1. 加入目前的練習清單
                 characters.push({ char, strokes: stroke, completed: false });
                 currentIndex = characters.length - 1;
+                
+                // 2. 同步到字庫圖鑑 (如果字庫還沒有這個字)
+                if (!masterLibrary.some(item => item.char === char)) {
+                    masterLibrary.push({ char, strokes: stroke });
+                    // 儲存最新的字庫到 localStorage
+                    localStorage.setItem('writing_custom_library', JSON.stringify(masterLibrary));
+                }
+
                 document.getElementById('custom-modal').classList.remove('active');
                 document.getElementById('custom-char-input').value = "";
                 document.getElementById('custom-stroke-input').value = "";
-                clearCanvas(); renderSteps(); saveProgress();
+                
+                clearCanvas(); 
+                renderSteps(); 
+                saveProgress();
+                renderGallery(); // 更新圖鑑視圖
             }
         };
 
