@@ -536,6 +536,22 @@
         document.getElementById('save-custom').onclick = () => {
             const char = document.getElementById('custom-char-input').value.trim();
             const stroke = parseInt(document.getElementById('custom-stroke-input').value);
+            
+            if (!char) return;
+
+            // 檢查是否已經在練習清單中
+            const existingIndex = characters.findIndex(item => item.char === char);
+            if (existingIndex !== -1) {
+                // 如果已經存在，直接跳轉到該字
+                currentIndex = existingIndex;
+                document.getElementById('custom-modal').classList.remove('active');
+                document.getElementById('custom-char-input').value = "";
+                document.getElementById('custom-stroke-input').value = "";
+                clearCanvas();
+                renderSteps();
+                return;
+            }
+
             if (char && stroke > 0) {
                 characters.push({ char, strokes: stroke, completed: false });
                 currentIndex = characters.length - 1;
