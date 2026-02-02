@@ -18,7 +18,8 @@
             background-position: center;
             background-color: #38C0FF;
         }
-        .chinese-font { font-family: 'Klee One', "BiauKai", serif; }
+        /* 將標楷體設為優先，Klee One 作為備選 */
+        .chinese-font { font-family: "BiauKai", "DFKai-SB", "標楷體", 'Klee One', serif; }
         .canvas-container { position: relative; background-color: white; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; }
         #ref-canvas { position: absolute; top: 0; left: 0; z-index: 5; opacity: 0; pointer-events: none; }
@@ -252,7 +253,6 @@
             { char: "習", strokes: 11, completed: false }
         ];
 
-        // 完整字庫資料 (改為 let 讓它可以動態增加)
         let masterLibrary = [
             { char: "一", strokes: 1 }, { char: "二", strokes: 2 }, { char: "三", strokes: 3 }, { char: "十", strokes: 2 },
             { char: "大", strokes: 3 }, { char: "小", strokes: 3 }, { char: "天", strokes: 4 }, { char: "人", strokes: 2 },
@@ -303,12 +303,10 @@
             } else {
                 displayUsername.innerText = savedName;
                 
-                // 讀取自訂字庫 (圖鑑同步)
                 const savedCustomLibrary = localStorage.getItem('writing_custom_library');
                 if (savedCustomLibrary) {
                     try {
                         const customLib = JSON.parse(savedCustomLibrary);
-                        // 合併並去重
                         customLib.forEach(item => {
                             if (!masterLibrary.some(libItem => libItem.char === item.char)) {
                                 masterLibrary.push(item);
@@ -332,7 +330,7 @@
                 }
                 renderSteps();
                 setupCanvasSize();
-                renderGallery(); // 初始化圖鑑
+                renderGallery();
             }
         }
 
@@ -351,7 +349,10 @@
             progressFill.style.width = `${progressPercent}%`;
             progressChar.style.left = `${progressPercent}%`;
             progressText.innerText = `學習進度：${completedCount}`;
+            
+            // 更新水印漢字
             watermark.innerText = characters[currentIndex].char;
+            
             document.getElementById('target-stroke').innerText = "/ " + characters[currentIndex].strokes;
             document.getElementById('stroke-count').innerText = paths.length;
             updateReference();
@@ -360,10 +361,11 @@
         function updateReference() {
             const size = canvas.width;
             if (size <= 0) return;
-            document.fonts.load(`1em "Klee One"`).then(() => {
+            // 參考字體優先使用標楷體
+            document.fonts.load(`1em "BiauKai"`).then(() => {
                 refCtx.clearRect(0,0,size,size);
                 refCtx.fillStyle = "black";
-                refCtx.font = `${size*0.75}px 'Klee One'`; 
+                refCtx.font = `${size*0.75}px "BiauKai", "DFKai-SB", "標楷體", 'Klee One'`; 
                 refCtx.textAlign = 'center';
                 refCtx.textBaseline = 'middle';
                 refCtx.fillText(characters[currentIndex].char, size/2, size/2);
@@ -474,7 +476,6 @@
             } 
         }
 
-        // --- 字庫圖鑑功能 ---
         function renderGallery() {
             const grid = document.getElementById('gallery-grid');
             const search = document.getElementById('gallery-search').value.trim();
@@ -506,7 +507,7 @@
                         clearCanvas();
                         renderSteps();
                         saveProgress();
-                        renderGallery(); // 重新渲染標記已加入
+                        renderGallery();
                     };
                 }
                 grid.appendChild(div);
@@ -521,7 +522,6 @@
         document.getElementById('gallery-search').oninput = renderGallery;
         document.getElementById('gallery-stroke-filter').onchange = renderGallery;
 
-        // --- 原始功能按鈕 ---
         document.getElementById('logout-btn').onclick = () => { if(confirm("確定要登出嗎？")) { localStorage.clear(); location.reload(); } };
         document.getElementById('custom-trigger-btn').onclick = () => document.getElementById('custom-modal').classList.add('active');
         document.getElementById('cancel-custom').onclick = () => document.getElementById('custom-modal').classList.remove('active');
@@ -530,14 +530,11 @@
             const char = document.getElementById('custom-char-input').value.trim();
             const stroke = parseInt(document.getElementById('custom-stroke-input').value);
             if (char && stroke > 0) {
-                // 1. 加入目前的練習清單
                 characters.push({ char, strokes: stroke, completed: false });
                 currentIndex = characters.length - 1;
                 
-                // 2. 同步到字庫圖鑑 (如果字庫還沒有這個字)
                 if (!masterLibrary.some(item => item.char === char)) {
                     masterLibrary.push({ char, strokes: stroke });
-                    // 儲存最新的字庫到 localStorage
                     localStorage.setItem('writing_custom_library', JSON.stringify(masterLibrary));
                 }
 
@@ -548,7 +545,7 @@
                 clearCanvas(); 
                 renderSteps(); 
                 saveProgress();
-                renderGallery(); // 更新圖鑑視圖
+                renderGallery();
             }
         };
 
