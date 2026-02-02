@@ -114,7 +114,7 @@
     </div>
 
     <main class="w-[92%] max-w-md mx-auto">
-        /* 學生資訊 */
+        <!--學生資訊-->
         <div class="mb-4 px-1 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <div class="glass-panel px-4 py-1.5 rounded-full shadow-md flex items-center gap-2">
@@ -130,15 +130,15 @@
             </button>
         </div>
 
-        /* 操作欄 */
-        /* 顯示筆劃數 */
+        <!--操作欄-->
+        <!--顯示筆劃數-->
         <div class="flex justify-between items-center mb-6 px-1">
             <div class="flex items-center gap-3 glass-panel px-4 py-2 rounded-full shadow-lg">
                 <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">筆劃</span>
                 <span id="stroke-count" class="text-2xl font-black text-slate-700">0</span>
                 <span id="target-stroke" class="text-xs px-2 py-0.5 bg-slate-100 text-slate-400 rounded-full">/ 0</span>
             </div>
-           /* 操作按鈕 */ 
+           <!--操作按鈕-->
             <div class="flex gap-2">
                 <button id="gallery-trigger-btn" class="p-2 glass-panel text-slate-600 rounded-full hover:bg-white transition-colors shadow-lg active:scale-95" title="字庫">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M16 2v20"/></svg>
@@ -153,7 +153,7 @@
             </div>
         </div>
 
-        /* 畫布樣式及圖層 */
+        <!--畫布樣式及圖層-->
         <div class="canvas-container aspect-square w-full rounded-3xl overflow-hidden mb-8 border-2 border-white/50">
             <div id="success-tick">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -166,7 +166,7 @@
             <canvas id="ref-canvas"></canvas>
         </div>
 
-        /* 進度列及選字 */
+        <!--進度列及選字-->
         <div class="glass-panel p-5 rounded-3xl shadow-xl">
             <div id="progress-text" class="text-[11px] text-slate-500 font-bold mb-2 text-center">準備中...</div>
             <div class="progress-bar-container">
@@ -177,7 +177,7 @@
         </div>
     </main>
 
-    /* 登入彈窗 */
+    <!--登入彈窗-->
     <div id="user-modal" class="modal-overlay">
         <div class="bg-white p-8 rounded-[40px] shadow-2xl w-full max-w-xs text-center flex flex-col items-center">
             <img src="https://raw.githubusercontent.com/linda0322/writingcloud/refs/heads/main/Robot.gif" alt="機器人" class="w-24 h-24 mb-6">
@@ -187,7 +187,7 @@
         </div>
     </div>
 
-    /* 增字彈窗 */
+    <!--增字彈窗-->
     <div id="custom-modal" class="modal-overlay">
         <div class="bg-white p-8 rounded-[35px] shadow-2xl w-full max-w-xs text-center">
             <h3 class="font-bold text-slate-700 mb-4">加入新字</h3>
@@ -204,7 +204,7 @@
         </div>
     </div>
 
-    /* 字庫彈窗 */
+    <!--字庫彈窗-->
     <div id="gallery-modal" class="modal-overlay">
         <div class="bg-white p-6 rounded-[40px] shadow-2xl w-full max-w-md h-[85vh] flex flex-col">
             <div class="flex justify-between items-center mb-6">
@@ -219,7 +219,7 @@
                 </button>
             </div>
 
-            /* 搜尋與過濾 */
+            <!--搜尋-->
             <div class="flex gap-2 mb-6">
                 <div class="relative flex-1">
                     <input type="text" id="gallery-search" placeholder="搜尋" class="w-full bg-slate-100 border-none rounded-2xl px-4 py-3 pl-10 text-sm font-bold outline-none focus:ring-2 focus:ring-amber-200">
@@ -230,7 +230,7 @@
                 </select>
             </div>
 
-            /* 動態字磚 */
+            <!--字卡-->
             <div id="gallery-grid" class="grid grid-cols-4 gap-3 overflow-y-auto pr-1 scrollbar-hide">
             </div>
             
@@ -238,7 +238,7 @@
         </div>
     </div>
 
-    /* Google Sheet API */
+    <!--Google API-->
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzJnjgmToB2wH9jgri2IP04l34k_cqLGad6EqKHjKVq6w3_bx7dxZz88c7nOZt_2oQZ/exec"; 
         
@@ -256,7 +256,7 @@
         const progressText = document.getElementById('progress-text');
         const successTick = document.getElementById('success-tick');
 
-        /* 預設選字 */
+        /* 登入彈窗 */
         const defaultCharacters = [
             { char: "我", strokes: 7, completed: false },
             { char: "你", strokes: 7, completed: false },
