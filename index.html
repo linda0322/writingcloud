@@ -215,13 +215,11 @@
             <div class="flex gap-2 mb-6">
                 <div class="relative flex-1">
                     <input type="text" id="gallery-search" placeholder="搜尋漢字..." class="w-full bg-slate-100 border-none rounded-2xl px-4 py-3 pl-10 text-sm font-bold outline-none focus:ring-2 focus:ring-amber-200">
-                    <svg class="absolute left-3 top-3.5 text-slate-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <svg class="absolute left-3 top-3.5 text-slate-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
                 </div>
-                <select id="gallery-stroke-filter" class="bg-slate-100 border-none rounded-2xl px-3 text-xs font-bold outline-none">
-                    <option value="all">所有筆劃</option>
-                    <option value="1-5">1-5 劃</option>
-                    <option value="6-10">6-10 劃</option>
-                    <option value="11+">11 劃以上</option>
+                <select id="gallery-category-filter" class="bg-slate-100 border-none rounded-2xl px-3 text-xs font-bold outline-none min-w-[100px]">
+                    <option value="all">所有主題</option>
+                    <!-- 動態生成選項 -->
                 </select>
             </div>
 
@@ -261,17 +259,17 @@
         ];
 
         let masterLibrary = [
-            { char: "一", strokes: 1 }, { char: "二", strokes: 2 }, { char: "三", strokes: 3 }, { char: "十", strokes: 2 },
-            { char: "大", strokes: 3 }, { char: "小", strokes: 3 }, { char: "天", strokes: 4 }, { char: "人", strokes: 2 },
-            { char: "口", strokes: 3 }, { char: "日", strokes: 4 }, { char: "月", strokes: 4 }, { char: "山", strokes: 3 },
-            { char: "水", strokes: 4 }, { char: "火", strokes: 4 }, { char: "木", strokes: 4 }, { char: "土", strokes: 3 },
-            { char: "中", strokes: 4 }, { char: "文", strokes: 4 }, { char: "王", strokes: 4 }, { char: "玉", strokes: 5 },
-            { char: "左", strokes: 5 }, { char: "右", strokes: 5 }, { char: "上", strokes: 3 }, { char: "下", strokes: 3 },
-            { char: "白", strokes: 5 }, { char: "的", strokes: 8 }, { char: "是", strokes: 9 }, { char: "好", strokes: 6 },
-            { char: "不", strokes: 4 }, { char: "了", strokes: 2 }, { char: "家", strokes: 10 }, { char: "電", strokes: 13 },
-            { char: "車", strokes: 7 }, { char: "馬", strokes: 10 }, { char: "鳥", strokes: 11 }, { char: "魚", strokes: 11 },
-            { char: "雲", strokes: 12 }, { char: "雨", strokes: 8 }, { char: "風", strokes: 9 }, { char: "雪", strokes: 11 },
-            { char: "春", strokes: 9 }, { char: "夏", strokes: 10 }, { char: "秋", strokes: 9 }, { char: "冬", strokes: 5 }
+            { char: "一", strokes: 1, categories: ["數字"] }, { char: "二", strokes: 2, categories: ["數字"] }, { char: "三", strokes: 3, categories: ["數字"] }, { char: "十", strokes: 2, categories: ["數字"] },
+            { char: "大", strokes: 3, categories: ["對比"] }, { char: "小", strokes: 3, categories: ["對比"] }, { char: "天", strokes: 4, categories: ["自然"] }, { char: "人", strokes: 2, categories: ["人類"] },
+            { char: "口", strokes: 3, categories: ["器官"] }, { char: "日", strokes: 4, categories: ["自然", "時間"] }, { char: "月", strokes: 4, categories: ["自然", "時間"] }, { char: "山", strokes: 3, categories: ["自然"] },
+            { char: "水", strokes: 4, categories: ["自然"] }, { char: "火", strokes: 4, categories: ["自然"] }, { char: "木", strokes: 4, categories: ["自然"] }, { char: "土", strokes: 3, categories: ["自然"] },
+            { char: "中", strokes: 4, categories: ["方位"] }, { char: "文", strokes: 4, categories: ["學術"] }, { char: "王", strokes: 4, categories: ["人類"] }, { char: "玉", strokes: 5, categories: ["物品"] },
+            { char: "左", strokes: 5, categories: ["方位"] }, { char: "右", strokes: 5, categories: ["方位"] }, { char: "上", strokes: 3, categories: ["方位"] }, { char: "下", strokes: 3, categories: ["方位"] },
+            { char: "白", strokes: 5, categories: ["顏色"] }, { char: "的", strokes: 8, categories: ["常用"] }, { char: "是", strokes: 9, categories: ["常用"] }, { char: "好", strokes: 6, categories: ["常用"] },
+            { char: "不", strokes: 4, categories: ["常用"] }, { char: "了", strokes: 2, categories: ["常用"] }, { char: "家", strokes: 10, categories: ["地點"] }, { char: "電", strokes: 13, categories: ["物品"] },
+            { char: "車", strokes: 7, categories: ["物品"] }, { char: "馬", strokes: 10, categories: ["動物"] }, { char: "鳥", strokes: 11, categories: ["動物"] }, { char: "魚", strokes: 11, categories: ["動物"] },
+            { char: "雲", strokes: 12, categories: ["自然"] }, { char: "雨", strokes: 8, categories: ["自然"] }, { char: "風", strokes: 9, categories: ["自然"] }, { char: "雪", strokes: 11, categories: ["自然"] },
+            { char: "春", strokes: 9, categories: ["時間"] }, { char: "夏", strokes: 10, categories: ["時間"] }, { char: "秋", strokes: 9, categories: ["時間"] }, { char: "冬", strokes: 5, categories: ["時間"] }
         ];
 
         let characters = [...defaultCharacters];
@@ -335,6 +333,7 @@
                     if (localChars) characters = JSON.parse(localChars);
                     if (localIndex) currentIndex = parseInt(localIndex);
                 }
+                updateCategoryFilter();
                 renderSteps();
                 setupCanvasSize();
                 renderGallery();
@@ -483,18 +482,38 @@
             } 
         }
 
+        // 動態生成選單
+        function updateCategoryFilter() {
+            const filterSelect = document.getElementById('gallery-category-filter');
+            // 抓出所有類別
+            const allCats = masterLibrary.flatMap(item => item.categories || ["未分類"]);
+            // 去重
+            const uniqueCats = [...new Set(allCats)].sort();
+            
+            filterSelect.innerHTML = '<option value="all">所有主題</option>';
+            uniqueCats.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.innerText = cat;
+                filterSelect.appendChild(opt);
+            });
+        }
+
         function renderGallery() {
             const grid = document.getElementById('gallery-grid');
             const search = document.getElementById('gallery-search').value.trim();
-            const filter = document.getElementById('gallery-stroke-filter').value;
+            const filter = document.getElementById('gallery-category-filter').value;
             grid.innerHTML = '';
 
             const filtered = masterLibrary.filter(item => {
                 const matchSearch = !search || item.char.includes(search);
+                
                 let matchFilter = true;
-                if (filter === '1-5') matchFilter = item.strokes <= 5;
-                else if (filter === '6-10') matchFilter = item.strokes >= 6 && item.strokes <= 10;
-                else if (filter === '11+') matchFilter = item.strokes >= 11;
+                if (filter !== 'all') {
+                    const itemCats = item.categories || ["未分類"];
+                    matchFilter = itemCats.includes(filter);
+                }
+                
                 return matchSearch && matchFilter;
             });
 
@@ -522,12 +541,13 @@
         }
 
         document.getElementById('gallery-trigger-btn').onclick = () => {
+            updateCategoryFilter(); // 打開時刷新選單以防自訂新字加入了新主題
             renderGallery();
             document.getElementById('gallery-modal').classList.add('active');
         };
         document.getElementById('close-gallery').onclick = () => document.getElementById('gallery-modal').classList.remove('active');
         document.getElementById('gallery-search').oninput = renderGallery;
-        document.getElementById('gallery-stroke-filter').onchange = renderGallery;
+        document.getElementById('gallery-category-filter').onchange = renderGallery;
 
         document.getElementById('logout-btn').onclick = () => { if(confirm("確定要登出嗎？")) { localStorage.clear(); location.reload(); } };
         document.getElementById('custom-trigger-btn').onclick = () => document.getElementById('custom-modal').classList.add('active');
@@ -553,11 +573,12 @@
             }
 
             if (char && stroke > 0) {
-                characters.push({ char, strokes: stroke, completed: false });
+                const newCharObj = { char, strokes: stroke, completed: false, categories: ["未分類"] };
+                characters.push(newCharObj);
                 currentIndex = characters.length - 1;
                 
                 if (!masterLibrary.some(item => item.char === char)) {
-                    masterLibrary.push({ char, strokes: stroke });
+                    masterLibrary.push({ char, strokes: stroke, categories: ["未分類"] });
                     localStorage.setItem('writing_custom_library', JSON.stringify(masterLibrary));
                 }
 
@@ -568,6 +589,7 @@
                 clearCanvas(); 
                 renderSteps(); 
                 saveProgress();
+                updateCategoryFilter();
                 renderGallery();
             }
         };
