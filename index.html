@@ -74,6 +74,19 @@
         
         button:active { transform: scale(0.95); transition: transform 0.1s; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+        /* 字庫卡片樣式 */
+        .char-card {
+            transition: all 0.2s;
+            aspect-ratio: 1/1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .char-card:hover { transform: translateY(-2px); background-color: white; }
+        .char-card.exists { opacity: 0.5; cursor: default; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -111,6 +124,9 @@
             <div class="flex gap-2">
                 <button id="undo-btn" class="p-2 glass-panel text-slate-600 rounded-full hover:bg-white transition-colors shadow-lg active:scale-95" title="撤銷上一筆">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+                </button>
+                <button id="gallery-trigger-btn" class="p-2 glass-panel text-amber-600 rounded-full hover:bg-white transition-colors shadow-lg active:scale-95" title="字庫圖鑑">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                 </button>
                 <button id="custom-trigger-btn" class="p-2 glass-panel text-blue-600 rounded-full hover:bg-white transition-colors shadow-lg active:scale-95" title="自訂漢字">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -172,6 +188,44 @@
         </div>
     </div>
 
+    <!-- 字庫圖鑑視窗 -->
+    <div id="gallery-modal" class="modal-overlay">
+        <div class="bg-white/90 backdrop-blur-xl p-6 rounded-[40px] shadow-2xl w-full max-w-md h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </div>
+                    <h3 class="font-bold text-slate-700 text-xl">字庫圖鑑</h3>
+                </div>
+                <button id="close-gallery" class="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <!-- 搜尋與過濾 -->
+            <div class="flex gap-2 mb-6">
+                <div class="relative flex-1">
+                    <input type="text" id="gallery-search" placeholder="搜尋漢字..." class="w-full bg-slate-100 border-none rounded-2xl px-4 py-3 pl-10 text-sm font-bold outline-none focus:ring-2 focus:ring-amber-200">
+                    <svg class="absolute left-3 top-3.5 text-slate-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
+                <select id="gallery-stroke-filter" class="bg-slate-100 border-none rounded-2xl px-3 text-xs font-bold outline-none">
+                    <option value="all">所有筆劃</option>
+                    <option value="1-5">1-5 劃</option>
+                    <option value="6-10">6-10 劃</option>
+                    <option value="11+">11 劃以上</option>
+                </select>
+            </div>
+
+            <!-- 字磚列表 -->
+            <div id="gallery-grid" class="grid grid-cols-4 gap-3 overflow-y-auto pr-1 scrollbar-hide">
+                <!-- 動態生成 -->
+            </div>
+            
+            <div class="mt-6 text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">點擊漢字加入練習</div>
+        </div>
+    </div>
+
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzJnjgmToB2wH9jgri2IP04l34k_cqLGad6EqKHjKVq6w3_bx7dxZz88c7nOZt_2oQZ/exec"; 
         
@@ -196,6 +250,21 @@
             { char: "愛", strokes: 13, completed: false },
             { char: "學", strokes: 16, completed: false },
             { char: "習", strokes: 11, completed: false }
+        ];
+
+        // 完整字庫資料
+        const masterLibrary = [
+            { char: "一", strokes: 1 }, { char: "二", strokes: 2 }, { char: "三", strokes: 3 }, { char: "十", strokes: 2 },
+            { char: "大", strokes: 3 }, { char: "小", strokes: 3 }, { char: "天", strokes: 4 }, { char: "人", strokes: 2 },
+            { char: "口", strokes: 3 }, { char: "日", strokes: 4 }, { char: "月", strokes: 4 }, { char: "山", strokes: 3 },
+            { char: "水", strokes: 4 }, { char: "火", strokes: 4 }, { char: "木", strokes: 4 }, { char: "土", strokes: 3 },
+            { char: "中", strokes: 4 }, { char: "文", strokes: 4 }, { char: "王", strokes: 4 }, { char: "玉", strokes: 5 },
+            { char: "左", strokes: 5 }, { char: "右", strokes: 5 }, { char: "上", strokes: 3 }, { char: "下", strokes: 3 },
+            { char: "白", strokes: 5 }, { char: "的", strokes: 8 }, { char: "是", strokes: 9 }, { char: "好", strokes: 6 },
+            { char: "不", strokes: 4 }, { char: "了", strokes: 2 }, { char: "家", strokes: 10 }, { char: "電", strokes: 13 },
+            { char: "車", strokes: 7 }, { char: "馬", strokes: 10 }, { char: "鳥", strokes: 11 }, { char: "魚", strokes: 11 },
+            { char: "雲", strokes: 12 }, { char: "雨", strokes: 8 }, { char: "風", strokes: 9 }, { char: "雪", strokes: 11 },
+            { char: "春", strokes: 9 }, { char: "夏", strokes: 10 }, { char: "秋", strokes: 9 }, { char: "冬", strokes: 5 }
         ];
 
         let characters = [...defaultCharacters];
@@ -248,6 +317,7 @@
                 }
                 renderSteps();
                 setupCanvasSize();
+                renderGallery(); // 初始化圖鑑
             }
         }
 
@@ -275,11 +345,10 @@
         function updateReference() {
             const size = canvas.width;
             if (size <= 0) return;
-            // 確保字體載入
             document.fonts.load(`1em "Klee One"`).then(() => {
                 refCtx.clearRect(0,0,size,size);
                 refCtx.fillStyle = "black";
-                refCtx.font = `${size*0.75}px 'Klee One'`; // 調整比例使其與浮水印一致
+                refCtx.font = `${size*0.75}px 'Klee One'`; 
                 refCtx.textAlign = 'center';
                 refCtx.textBaseline = 'middle';
                 refCtx.fillText(characters[currentIndex].char, size/2, size/2);
@@ -291,7 +360,7 @@
             if (size <= 0) return;
             canvas.width = canvas.height = refCanvas.width = refCanvas.height = size;
             ctx.lineCap = ctx.lineJoin = 'round';
-            ctx.lineWidth = size * 0.035; 
+            ctx.lineWidth = size * 0.045; 
             ctx.strokeStyle = '#1e293b';
             redrawCanvas();
             updateReference();
@@ -352,34 +421,23 @@
             const target = characters[currentIndex].strokes;
             const currentStrokeCount = paths.length;
             const size = canvas.width;
-            
-            // 1. 先抓取畫面數據
             const drawData = ctx.getImageData(0, 0, size, size).data;
             const refData = refCtx.getImageData(0, 0, size, size).data;
-            
             let refPixels = 0, matchedPixels = 0, wrongPixels = 0;
-            
-            // 2. 進行像素比對
             for (let i = 3; i < drawData.length; i += 16) {
-                const isDrawn = drawData[i] > 30; // 學生畫的地方
-                const isRef = refData[i] > 30;   // 標準答案的地方
-                
+                const isDrawn = drawData[i] > 30; 
+                const isRef = refData[i] > 30;   
                 if (isRef) refPixels++;
                 if (isDrawn && isRef) matchedPixels++;
                 if (isDrawn && !isRef) wrongPixels++;
             }
-            
-            // 3. 計算分數
             const completion = (matchedPixels / (refPixels || 1)) * 100;
             const internalScore = (completion * 3.5) - ((wrongPixels / (refPixels || 1)) * 8);
-            
-            // 4. 同時滿足：筆劃數對了 + 結構分數及格 (70)
-            if (currentStrokeCount === target && internalScore >= 70) {
+            if (currentStrokeCount === target && internalScore >= 35) {
                 characters[currentIndex].completed = true;
                 successTick.classList.add('show');
                 saveProgress();
                 renderSteps();
-                
                 setTimeout(() => {
                     successTick.classList.remove('show');
                     const next = characters.findIndex((c, i) => !c.completed && i > currentIndex);
@@ -401,6 +459,54 @@
             } 
         }
 
+        // --- 字庫圖鑑功能 ---
+        function renderGallery() {
+            const grid = document.getElementById('gallery-grid');
+            const search = document.getElementById('gallery-search').value.trim();
+            const filter = document.getElementById('gallery-stroke-filter').value;
+            grid.innerHTML = '';
+
+            const filtered = masterLibrary.filter(item => {
+                const matchSearch = !search || item.char.includes(search);
+                let matchFilter = true;
+                if (filter === '1-5') matchFilter = item.strokes <= 5;
+                else if (filter === '6-10') matchFilter = item.strokes >= 6 && item.strokes <= 10;
+                else if (filter === '11+') matchFilter = item.strokes >= 11;
+                return matchSearch && matchFilter;
+            });
+
+            filtered.forEach(item => {
+                const alreadyHas = characters.some(c => c.char === item.char);
+                const div = document.createElement('div');
+                div.className = `char-card bg-slate-100 rounded-2xl p-2 ${alreadyHas ? 'exists' : 'hover:shadow-md'}`;
+                div.innerHTML = `
+                    <span class="chinese-font text-2xl font-bold text-slate-700">${item.char}</span>
+                    <span class="text-[9px] text-slate-400 font-bold mt-1">${item.strokes} 劃</span>
+                `;
+                if (!alreadyHas) {
+                    div.onclick = () => {
+                        characters.push({ ...item, completed: false });
+                        currentIndex = characters.length - 1;
+                        document.getElementById('gallery-modal').classList.remove('active');
+                        clearCanvas();
+                        renderSteps();
+                        saveProgress();
+                        renderGallery(); // 重新渲染標記已加入
+                    };
+                }
+                grid.appendChild(div);
+            });
+        }
+
+        document.getElementById('gallery-trigger-btn').onclick = () => {
+            renderGallery();
+            document.getElementById('gallery-modal').classList.add('active');
+        };
+        document.getElementById('close-gallery').onclick = () => document.getElementById('gallery-modal').classList.remove('active');
+        document.getElementById('gallery-search').oninput = renderGallery;
+        document.getElementById('gallery-stroke-filter').onchange = renderGallery;
+
+        // --- 原始功能按鈕 ---
         document.getElementById('logout-btn').onclick = () => { if(confirm("確定要登出嗎？")) { localStorage.clear(); location.reload(); } };
         document.getElementById('custom-trigger-btn').onclick = () => document.getElementById('custom-modal').classList.add('active');
         document.getElementById('cancel-custom').onclick = () => document.getElementById('custom-modal').classList.remove('active');
@@ -409,10 +515,11 @@
             const stroke = parseInt(document.getElementById('custom-stroke-input').value);
             if (char && stroke > 0) {
                 characters.push({ char, strokes: stroke, completed: false });
+                currentIndex = characters.length - 1;
                 document.getElementById('custom-modal').classList.remove('active');
                 document.getElementById('custom-char-input').value = "";
                 document.getElementById('custom-stroke-input').value = "";
-                saveProgress(); renderSteps();
+                clearCanvas(); renderSteps(); saveProgress();
             }
         };
 
