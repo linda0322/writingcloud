@@ -92,7 +92,7 @@
         /* 隱藏 scrollbar */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-        /* 字庫卡片樣式 */
+        /* 字卡樣式 */
         .char-card {
             transition: all 0.2s;
             aspect-ratio: 1/1;
@@ -102,8 +102,8 @@
             justify-content: center;
             cursor: pointer;
         }
-        .char-card:hover { transform: translateY(-2px); background-color: white; }
-        .char-card.exists { opacity: 0.5; cursor: default; }
+        .char-card:hover { transform: translateY(-2px); background-color: #F2F2F2; }
+        .char-card.exists { background-color: #F2F2F2; opacity: 0.5; cursor: default; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
