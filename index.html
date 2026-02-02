@@ -8,6 +8,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
+        /* 引入楳體字體 */
+        @font-face {
+            font-family: 'Iansui';
+            src: url('https://cdn.jsdelivr.net/gh/ButTaiwan/iansui@9d9a8e68bf1e138dd91e562eeff28d95bca33196/fonts/ttf/Iansui-Regular.ttf') format('truetype');
+            font-display: swap;
+        }
+
         body {
             font-family: 'Noto Sans TC', sans-serif;
             touch-action: none; 
@@ -18,8 +25,8 @@
             background-position: center;
             background-color: #38C0FF;
         }
-        /* 將標楷體設為優先，Klee One 作為備選 */
-        .chinese-font { font-family: "BiauKai", "DFKai-SB", "標楷體", 'Klee One', serif; }
+        /* 將 Iansui 設為最優先 */
+        .chinese-font { font-family: 'Iansui', "BiauKai", "DFKai-SB", "標楷體", 'Klee One', serif; }
         .canvas-container { position: relative; background-color: white; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; }
         #ref-canvas { position: absolute; top: 0; left: 0; z-index: 5; opacity: 0; pointer-events: none; }
@@ -361,11 +368,11 @@
         function updateReference() {
             const size = canvas.width;
             if (size <= 0) return;
-            // 參考字體優先使用標楷體
-            document.fonts.load(`1em "BiauKai"`).then(() => {
+            // 參考字體優先使用 Iansui
+            document.fonts.load(`1em "Iansui"`).then(() => {
                 refCtx.clearRect(0,0,size,size);
                 refCtx.fillStyle = "black";
-                refCtx.font = `${size*0.75}px "BiauKai", "DFKai-SB", "標楷體", 'Klee One'`; 
+                refCtx.font = `${size*0.75}px "Iansui", "BiauKai", "DFKai-SB", "標楷體", 'Klee One'`; 
                 refCtx.textAlign = 'center';
                 refCtx.textBaseline = 'middle';
                 refCtx.fillText(characters[currentIndex].char, size/2, size/2);
@@ -439,11 +446,11 @@
             const currentStrokeCount = paths.length;
             const size = canvas.width;
             const drawData = ctx.getImageData(0, 0, size, size).data;
-            const refData = refCtx.getImageData(0, 0, size, size).data;
+            const referenceData = refCtx.getImageData(0, 0, size, size).data;
             let refPixels = 0, matchedPixels = 0, wrongPixels = 0;
             for (let i = 3; i < drawData.length; i += 16) {
                 const isDrawn = drawData[i] > 30; 
-                const isRef = refData[i] > 30;   
+                const isRef = referenceData[i] > 30;   
                 if (isRef) refPixels++;
                 if (isDrawn && isRef) matchedPixels++;
                 if (isDrawn && !isRef) wrongPixels++;
