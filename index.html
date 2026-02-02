@@ -24,24 +24,7 @@
             background-size: cover;
             background-position: center;
             background-color: #38C0FF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
         }
-
-        /* 核心縮放容器：維持原始設計比例，但可整體縮小 */
-        #app-scaler {
-            width: 100%;
-            max-width: 400px; /* 原始設計基準寬度 */
-            transform-origin: center center;
-            transition: transform 0.2s ease-out;
-            display: flex;
-            flex-direction: column;
-            padding: 16px;
-        }
-
         /* 畫布位置及字體 */
         .chinese-font { font-family: 'Iansui', "BiauKai", "DFKai-SB", "標楷體", serif; }
         .canvas-container { position: relative; background-color: white; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
@@ -61,7 +44,9 @@
         #success-tick.show { transform: translate(-50%, -50%) scale(1.5); }
 
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
-        .step-btn.active { background-color: #30ABE4; color: white; border-color: white; }
+        /* 已選字 */
+        .step-btn.active { background-color: #38C0FF; color: white; border-color: white; }
+        /* 完成字 */
         .step-btn.completed::after { content: '✓'; position: absolute; top: -2px; right: -2px; background: #10B981; color: white; width: 14px; height: 14px; border-radius: 50%; font-size: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid white; }
 
         /* 進度列 */
@@ -93,15 +78,21 @@
             z-index: 20;
         }
 
+        /* 彈窗後的透黑遮罩 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
         .modal-overlay.active { display: flex; }
 
+        /* Google Drive Sync Noti */
         #sync-status { transition: opacity 0.3s; opacity: 0; }
         #sync-status.show { opacity: 1; }
 
+        /* 按鈕縮細效果 */
         button:active { transform: scale(0.95); transition: transform 0.1s; }
+
+        /* 隱藏 scrollbar */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
 
+        /* 字庫卡片樣式 */
         .char-card {
             transition: all 0.2s;
             aspect-ratio: 1/1;
@@ -115,15 +106,14 @@
         .char-card.exists { opacity: 0.5; cursor: default; }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
 
     <div id="sync-status" class="fixed top-6 right-6 z-[100] glass-panel px-4 py-2 rounded-full shadow-lg flex items-center gap-2 pointer-events-none">
         <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
         <span id="sync-text" class="text-xs font-bold text-slate-600">同步中...</span>
     </div>
 
-    <!-- 所有的內容都包在這個 scaler 裡面 -->
-    <main id="app-scaler">
+    <main class="w-full max-w-md">
         <!--學生資訊-->
         <div class="mb-4 px-1 flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -141,12 +131,14 @@
         </div>
 
         <!--操作欄-->
+        <!--顯示筆劃數-->
         <div class="flex justify-between items-center mb-6 px-1">
             <div class="flex items-center gap-3 glass-panel px-4 py-2 rounded-full shadow-lg">
                 <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">筆劃</span>
                 <span id="stroke-count" class="text-2xl font-black text-slate-700">0</span>
                 <span id="target-stroke" class="text-xs px-2 py-0.5 bg-slate-100 text-slate-400 rounded-full">/ 0</span>
             </div>
+           <!--操作按鈕-->
             <div class="flex gap-2">
                 <button id="gallery-trigger-btn" class="p-2 glass-panel text-slate-600 rounded-full hover:bg-white transition-colors shadow-lg active:scale-95" title="字庫">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M16 2v20"/></svg>
@@ -161,7 +153,7 @@
             </div>
         </div>
 
-        <!--畫布-->
+        <!--畫布樣式及圖層-->
         <div class="canvas-container aspect-square w-full rounded-3xl overflow-hidden mb-8 border-2 border-white/50">
             <div id="success-tick">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -174,7 +166,7 @@
             <canvas id="ref-canvas"></canvas>
         </div>
 
-        <!--進度與選字-->
+        <!--進度列及選字-->
         <div class="glass-panel p-5 rounded-3xl shadow-xl">
             <div id="progress-text" class="text-[11px] text-slate-500 font-bold mb-2 text-center">準備中...</div>
             <div class="progress-bar-container">
@@ -185,7 +177,7 @@
         </div>
     </main>
 
-    <!-- 彈窗部分保持在最外層（不縮放）以確保操作性 -->
+    <!--登入彈窗-->
     <div id="user-modal" class="modal-overlay">
         <div class="bg-white p-8 rounded-[40px] shadow-2xl w-full max-w-xs text-center flex flex-col items-center">
             <img src="https://raw.githubusercontent.com/linda0322/writingcloud/refs/heads/main/Robot.gif" alt="機器人" class="w-24 h-24 mb-6">
@@ -195,6 +187,7 @@
         </div>
     </div>
 
+    <!--增字彈窗-->
     <div id="custom-modal" class="modal-overlay">
         <div class="bg-white p-8 rounded-[35px] shadow-2xl w-full max-w-xs text-center">
             <h3 class="font-bold text-slate-700 mb-4">加入新字</h3>
@@ -211,6 +204,7 @@
         </div>
     </div>
 
+    <!--字庫彈窗-->
     <div id="gallery-modal" class="modal-overlay">
         <div class="bg-white p-6 rounded-[40px] shadow-2xl w-full max-w-md h-[85vh] flex flex-col">
             <div class="flex justify-between items-center mb-6">
@@ -224,6 +218,8 @@
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
+
+            <!--搜尋-->
             <div class="flex gap-2 mb-6">
                 <div class="relative flex-1">
                     <input type="text" id="gallery-search" placeholder="搜尋" class="w-full bg-slate-100 border-none rounded-2xl px-4 py-3 pl-10 text-sm font-bold outline-none focus:ring-2 focus:ring-amber-200">
@@ -233,15 +229,19 @@
                     <option value="all">所有主題</option>
                 </select>
             </div>
-            <div id="gallery-grid" class="grid grid-cols-4 gap-3 overflow-y-auto pr-1 scrollbar-hide"></div>
+
+            <!--字卡-->
+            <div id="gallery-grid" class="grid grid-cols-4 gap-3 overflow-y-auto pr-1 scrollbar-hide">
+            </div>
+            
             <div class="mt-6 text-center text-[12px] text-slate-400 font-bold uppercase tracking-widest">點擊字卡練習</div>
         </div>
     </div>
 
+    <!--Google API-->
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzJnjgmToB2wH9jgri2IP04l34k_cqLGad6EqKHjKVq6w3_bx7dxZz88c7nOZt_2oQZ/exec"; 
         
-        const scaler = document.getElementById('app-scaler');
         const canvas = document.getElementById('drawing-canvas');
         const ctx = canvas.getContext('2d', { desynchronized: true });
         const refCanvas = document.getElementById('ref-canvas');
@@ -256,23 +256,7 @@
         const progressText = document.getElementById('progress-text');
         const successTick = document.getElementById('success-tick');
 
-        // 等比例縮放邏輯
-        function applyScale() {
-            const viewportHeight = window.innerHeight;
-            const contentHeight = scaler.offsetHeight;
-            const viewportWidth = window.innerWidth;
-            const contentWidth = scaler.offsetWidth;
-
-            // 計算高度和寬度所需的縮放比例
-            let scaleH = (viewportHeight - 20) / contentHeight;
-            let scaleW = (viewportWidth - 20) / contentWidth;
-            
-            // 取得最適合的比例（不超過 1，即不放大只縮小）
-            let finalScale = Math.min(scaleH, scaleW, 1);
-            
-            scaler.style.transform = `scale(${finalScale})`;
-        }
-
+        /* 登入彈窗 */
         const defaultCharacters = [
             { char: "我", strokes: 7, completed: false },
             { char: "你", strokes: 7, completed: false },
@@ -282,6 +266,7 @@
             { char: "習", strokes: 11, completed: false }
         ];
 
+        /* 字庫 Database */
         let masterLibrary = [
             { char: "車", strokes: 7, categories: ["物品"] }, { char: "馬", strokes: 10, categories: ["動物"] }, { char: "鳥", strokes: 11, categories: ["動物"] }, { char: "魚", strokes: 11, categories: ["動物"] },
             { char: "雲", strokes: 12, categories: ["自然"] }, { char: "雨", strokes: 8, categories: ["自然"] }, { char: "風", strokes: 9, categories: ["自然"] }, { char: "雪", strokes: 11, categories: ["自然"] },
@@ -353,9 +338,6 @@
                 renderSteps();
                 setupCanvasSize();
                 renderGallery();
-                
-                // 初始化縮放
-                setTimeout(applyScale, 100);
             }
         }
 
@@ -404,20 +386,17 @@
             ctx.strokeStyle = '#1e293b';
             redrawCanvas();
             updateReference();
-            applyScale(); // 畫布尺寸改變後重新縮放
         }
 
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
-            // 這裡必須考慮 CSS transform 縮放後的座標計算
-            const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
-            const clientY = (e.touches ? e.touches[0].clientY : e.clientY);
-            
-            // 重要：使用 getBoundingClientRect 可以自動處理 scale 帶來的位移
-            return { 
-                x: (clientX - rect.left) * (canvas.width / rect.width), 
-                y: (clientY - rect.top) * (canvas.height / rect.height) 
-            };
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX; clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX; clientY = e.clientY;
+            }
+            return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
         function handleStart(e) {
@@ -502,6 +481,7 @@
             } 
         }
 
+        /* 動態生成選單 */
         function updateCategoryFilter() {
             const filterSelect = document.getElementById('gallery-category-filter');
             const allCats = masterLibrary.flatMap(item => item.categories || ["未分類"]);
@@ -524,7 +504,13 @@
 
             const filtered = masterLibrary.filter(item => {
                 const matchSearch = !search || item.char.includes(search);
-                let matchFilter = filter === 'all' || (item.categories || ["未分類"]).includes(filter);
+                
+                let matchFilter = true;
+                if (filter !== 'all') {
+                    const itemCats = item.categories || ["未分類"];
+                    matchFilter = itemCats.includes(filter);
+                }
+                
                 return matchSearch && matchFilter;
             });
 
@@ -567,26 +553,41 @@
         document.getElementById('save-custom').onclick = () => {
             const char = document.getElementById('custom-char-input').value.trim();
             const stroke = parseInt(document.getElementById('custom-stroke-input').value);
+            
             if (!char) return;
 
+            /* 檢查重複增字 */
             const existingIndex = characters.findIndex(item => item.char === char);
             if (existingIndex !== -1) {
+                /* 跳轉選字 */
                 currentIndex = existingIndex;
                 document.getElementById('custom-modal').classList.remove('active');
+                document.getElementById('custom-char-input').value = "";
+                document.getElementById('custom-stroke-input').value = "";
                 clearCanvas();
                 renderSteps();
                 return;
             }
 
             if (char && stroke > 0) {
-                characters.push({ char, strokes: stroke, completed: false, categories: ["未分類"] });
+                const newCharObj = { char, strokes: stroke, completed: false, categories: ["未分類"] };
+                characters.push(newCharObj);
                 currentIndex = characters.length - 1;
+                
                 if (!masterLibrary.some(item => item.char === char)) {
                     masterLibrary.push({ char, strokes: stroke, categories: ["未分類"] });
                     localStorage.setItem('writing_custom_library', JSON.stringify(masterLibrary));
                 }
+
                 document.getElementById('custom-modal').classList.remove('active');
-                clearCanvas(); renderSteps(); saveProgress(); updateCategoryFilter(); renderGallery();
+                document.getElementById('custom-char-input').value = "";
+                document.getElementById('custom-stroke-input').value = "";
+                
+                clearCanvas(); 
+                renderSteps(); 
+                saveProgress();
+                updateCategoryFilter();
+                renderGallery();
             }
         };
 
@@ -598,7 +599,7 @@
         };
 
         window.onload = initApp;
-        window.onresize = () => { setupCanvasSize(); applyScale(); };
+        window.onresize = setupCanvasSize;
     </script>
 </body>
 </html>
