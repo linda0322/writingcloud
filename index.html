@@ -589,19 +589,17 @@
             }
 
             if (char && stroke > 0) {
-                const newCharObj = { char, strokes: stroke, completed: false, categories: ["未分類"] };
+                const newCharObj = { char, strokes: stroke, completed: false, categories: ["未分類"], en: enKey };
                 characters.push(newCharObj);
                 currentIndex = characters.length - 1;
                 
                 if (!masterLibrary.some(item => item.char === char)) {
-                    masterLibrary.push({ char, strokes: stroke, categories: ["未分類"] });
+                    masterLibrary.push({ char, strokes: stroke, categories: ["未分類"], en: enKey });
                     localStorage.setItem('writing_custom_library', JSON.stringify(masterLibrary));
                 }
 
                 document.getElementById('custom-modal').classList.remove('active');
-                document.getElementById('custom-char-input').value = "";
-                document.getElementById('custom-stroke-input').value = "";
-                
+                clearInputs();
                 clearCanvas(); 
                 renderSteps(); 
                 saveProgress();
