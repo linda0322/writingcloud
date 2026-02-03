@@ -185,7 +185,6 @@
                         <input type="text" id="custom-char-input" maxlength="1" placeholder="字" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm">
                         <input type="number" id="custom-stroke-input" placeholder="筆劃" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm">
                     </div>
-                    <!-- 新增：英文注釋輸入 -->
                     <input type="text" id="custom-en-input" placeholder="英文關鍵字 (選填)" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-xs">
                 </div>
                 <div class="flex gap-2">
@@ -213,7 +212,7 @@
 
             <div class="flex gap-2 mb-6">
                 <div class="relative flex-1">
-                    <input type="text" id="gallery-search" placeholder="搜尋中文或英文" class="w-full bg-slate-100 border-none rounded-2xl px-4 py-3 pl-10 text-sm font-bold outline-none focus:ring-2 focus:ring-amber-200">
+                    <input type="text" id="gallery-search" placeholder="搜尋" class="w-full bg-slate-100 border-none rounded-2xl px-4 py-3 pl-10 text-sm font-bold outline-none focus:ring-2 focus:ring-amber-200">
                     <svg class="absolute left-3 top-3.5 text-slate-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
                 </div>
                 <select id="gallery-category-filter" class="bg-slate-100 border-none rounded-2xl px-3 text-sm font-bold outline-none min-w-[170px]">
@@ -242,7 +241,6 @@
         const progressText = document.getElementById('progress-text');
         const successTick = document.getElementById('success-tick');
 
-        // 預設字集加上英文屬性
         const defaultCharacters = [
             { char: "我", strokes: 7, completed: false, en: "me i" },
             { char: "你", strokes: 7, completed: false, en: "you" },
@@ -252,7 +250,6 @@
             { char: "習", strokes: 11, completed: false, en: "learn practice" }
         ];
 
-        // 字庫資料庫加上英文 (en) 屬性，用於後台搜尋
         let masterLibrary = [
             { char: "車", strokes: 7, categories: ["物品"], en: "car vehicle" },
             { char: "馬", strokes: 10, categories: ["動物"], en: "horse" },
@@ -486,7 +483,6 @@
             });
         }
 
-        // 修改：優化搜尋邏輯，加入英文比對
         function renderGallery() {
             const grid = document.getElementById('gallery-grid');
             const search = document.getElementById('gallery-search').value.trim().toLowerCase();
@@ -494,9 +490,7 @@
             grid.innerHTML = '';
 
             const filtered = masterLibrary.filter(item => {
-                // 比對漢字
                 const matchChar = item.char.includes(search);
-                // 比對英文屬性 (en)，若無 en 則不參與比對
                 const matchEn = item.en ? item.en.toLowerCase().includes(search) : false;
                 
                 const matchSearch = !search || matchChar || matchEn;
