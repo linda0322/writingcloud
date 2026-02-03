@@ -25,7 +25,6 @@
             background-position: center;
             background-color: #38C0FF;
         }
-        /* 畫布位置及字體 */
         .chinese-font { font-family: 'Iansui', "BiauKai", "DFKai-SB", "標楷體", serif; }
         .canvas-container { position: relative; background-color: white; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         #drawing-canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; }
@@ -44,12 +43,9 @@
         #success-tick.show { transform: translate(-50%, -50%) scale(1.5); }
 
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
-        /* 已選字 */
         .step-btn.active { background-color: #38C0FF; color: white; border-color: white; }
-        /* 完成字 */
         .step-btn.completed::after { content: '✓'; position: absolute; top: -2px; right: -2px; background: #10B981; color: white; width: 14px; height: 14px; border-radius: 50%; font-size: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid white; }
 
-        /* 進度列 */
         .progress-bar-container {
             position: relative;
             width: 100%;
@@ -78,21 +74,15 @@
             z-index: 20;
         }
 
-        /* 彈窗後的透黑遮罩 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
         .modal-overlay.active { display: flex; }
 
-        /* Google Drive Sync Noti */
         #sync-status { transition: opacity 0.3s; opacity: 0; }
         #sync-status.show { opacity: 1; }
 
-        /* 按鈕縮細效果 */
         button:active { transform: scale(0.95); transition: transform 0.1s; }
-
-        /* 隱藏 scrollbar */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-        /* 字卡樣式 */
         .char-card {
             transition: all 0.2s;
             aspect-ratio: 1/1;
@@ -131,14 +121,12 @@
         </div>
 
         <!--操作欄-->
-        <!--顯示筆劃數-->
         <div class="flex justify-between items-center mb-6 px-1">
             <div class="flex items-center gap-3 glass-panel px-4 py-2 rounded-full shadow-lg">
                 <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">筆劃</span>
                 <span id="stroke-count" class="text-2xl font-black text-slate-700">0</span>
                 <span id="target-stroke" class="text-xs px-2 py-0.5 bg-slate-100 text-slate-400 rounded-full">/ 0</span>
             </div>
-           <!--操作按鈕-->
             <div class="flex gap-2">
                 <button id="gallery-trigger-btn" class="p-2 glass-panel text-slate-600 rounded-full hover:bg-white transition-colors shadow-lg active:scale-95" title="字庫">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M16 2v20"/></svg>
@@ -153,7 +141,7 @@
             </div>
         </div>
 
-        <!--畫布樣式及圖層-->
+        <!--畫布-->
         <div class="canvas-container aspect-square w-full rounded-3xl overflow-hidden mb-8 border-2 border-white/50">
             <div id="success-tick">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -166,7 +154,7 @@
             <canvas id="ref-canvas"></canvas>
         </div>
 
-        <!--進度列及選字-->
+        <!--底部面板-->
         <div class="glass-panel p-5 rounded-3xl shadow-xl">
             <div id="progress-text" class="text-[11px] text-slate-500 font-bold mb-2 text-center">準備中...</div>
             <div class="progress-bar-container">
@@ -192,9 +180,13 @@
         <div class="bg-white p-8 rounded-[35px] shadow-2xl w-full max-w-xs text-center">
             <h3 class="font-bold text-slate-700 mb-4">加入新字</h3>
             <div class="space-y-4">
-                <div class="flex justify-center gap-2 mb-4">
-                    <input type="text" id="custom-char-input" maxlength="1" placeholder="字" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm">
-                    <input type="number" id="custom-stroke-input" placeholder="筆劃" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm">
+                <div class="flex flex-col gap-2 mb-4">
+                    <div class="flex justify-center gap-2">
+                        <input type="text" id="custom-char-input" maxlength="1" placeholder="字" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm">
+                        <input type="number" id="custom-stroke-input" placeholder="筆劃" class="w-20 border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-sm">
+                    </div>
+                    <!-- 新增：英文注釋輸入 -->
+                    <input type="text" id="custom-en-input" placeholder="英文關鍵字 (選填)" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-blue-400 placeholder:text-xs">
                 </div>
                 <div class="flex gap-2">
                     <button id="cancel-custom" class="flex-1 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold">取消</button>
@@ -219,10 +211,9 @@
                 </button>
             </div>
 
-            <!--搜尋-->
             <div class="flex gap-2 mb-6">
                 <div class="relative flex-1">
-                    <input type="text" id="gallery-search" placeholder="搜尋" class="w-full bg-slate-100 border-none rounded-2xl px-4 py-3 pl-10 text-sm font-bold outline-none focus:ring-2 focus:ring-amber-200">
+                    <input type="text" id="gallery-search" placeholder="搜尋中文或英文" class="w-full bg-slate-100 border-none rounded-2xl px-4 py-3 pl-10 text-sm font-bold outline-none focus:ring-2 focus:ring-amber-200">
                     <svg class="absolute left-3 top-3.5 text-slate-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
                 </div>
                 <select id="gallery-category-filter" class="bg-slate-100 border-none rounded-2xl px-3 text-sm font-bold outline-none min-w-[170px]">
@@ -230,15 +221,11 @@
                 </select>
             </div>
 
-            <!--字卡-->
-            <div id="gallery-grid" class="grid grid-cols-4 gap-3 overflow-y-auto pr-1 scrollbar-hide">
-            </div>
-            
+            <div id="gallery-grid" class="grid grid-cols-4 gap-3 overflow-y-auto pr-1 scrollbar-hide"></div>
             <div class="mt-6 text-center text-[12px] text-slate-400 font-bold uppercase tracking-widest">點擊字卡練習</div>
         </div>
     </div>
 
-    <!--Google API-->
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzJnjgmToB2wH9jgri2IP04l34k_cqLGad6EqKHjKVq6w3_bx7dxZz88c7nOZt_2oQZ/exec"; 
         
@@ -250,13 +237,12 @@
         const stepContainer = document.getElementById('step-container');
         const displayUsername = document.getElementById('display-username');
         const syncStatus = document.getElementById('sync-status');
-        const syncText = document.getElementById('sync-text');
         const progressFill = document.getElementById('progress-fill');
         const progressChar = document.getElementById('progress-character');
         const progressText = document.getElementById('progress-text');
         const successTick = document.getElementById('success-tick');
 
-        /* 登入彈窗 */
+        // 預設字集加上英文屬性
         const defaultCharacters = [
             { char: "我", strokes: 7, completed: false, en: "me i" },
             { char: "你", strokes: 7, completed: false, en: "you" },
@@ -266,14 +252,8 @@
             { char: "習", strokes: 11, completed: false, en: "learn practice" }
         ];
 
-        /* 字庫 Database */
+        // 字庫資料庫加上英文 (en) 屬性，用於後台搜尋
         let masterLibrary = [
-            { char: "我", strokes: 7, categories: ["代詞"], en: "me i" },
-            { char: "你", strokes: 7, categories: ["代詞"], en: "you" },
-            { char: "他", strokes: 5, categories: ["代詞"], en: "he him" },
-            { char: "愛", strokes: 13, categories: [""], en: "love" },
-            { char: "學", strokes: 16, categories: [""], en: "learn study school" },
-            { char: "習", strokes: 11, categories: [""], en: "learn practice" }
             { char: "車", strokes: 7, categories: ["物品"], en: "car vehicle" },
             { char: "馬", strokes: 10, categories: ["動物"], en: "horse" },
             { char: "鳥", strokes: 11, categories: ["動物"], en: "bird" },
@@ -287,7 +267,7 @@
             { char: "秋", strokes: 9, categories: ["時間"], en: "autumn fall" },
             { char: "冬", strokes: 5, categories: ["時間"], en: "winter" }
         ];
-        
+
         let characters = [...defaultCharacters];
         let currentIndex = 0;
         let isDrawing = false;
@@ -371,9 +351,7 @@
             progressFill.style.width = `${progressPercent}%`;
             progressChar.style.left = `${progressPercent}%`;
             progressText.innerText = `學習進度：${completedCount}`;
-            
             watermark.innerText = characters[currentIndex].char;
-            
             document.getElementById('target-stroke').innerText = "/ " + characters[currentIndex].strokes;
             document.getElementById('stroke-count').innerText = paths.length;
             updateReference();
@@ -496,21 +474,19 @@
             } 
         }
 
-        /* 動態生成選單 */
         function updateCategoryFilter() {
             const filterSelect = document.getElementById('gallery-category-filter');
             const allCats = masterLibrary.flatMap(item => item.categories || ["未分類"]);
             const uniqueCats = [...new Set(allCats)].sort();
-            
             filterSelect.innerHTML = '<option value="all">所有主題</option>';
             uniqueCats.forEach(cat => {
                 const opt = document.createElement('option');
-                opt.value = cat;
-                opt.innerText = cat;
+                opt.value = cat; opt.innerText = cat;
                 filterSelect.appendChild(opt);
             });
         }
 
+        // 修改：優化搜尋邏輯，加入英文比對
         function renderGallery() {
             const grid = document.getElementById('gallery-grid');
             const search = document.getElementById('gallery-search').value.trim().toLowerCase();
@@ -518,8 +494,11 @@
             grid.innerHTML = '';
 
             const filtered = masterLibrary.filter(item => {
+                // 比對漢字
                 const matchChar = item.char.includes(search);
+                // 比對英文屬性 (en)，若無 en 則不參與比對
                 const matchEn = item.en ? item.en.toLowerCase().includes(search) : false;
+                
                 const matchSearch = !search || matchChar || matchEn;
                 
                 let matchFilter = true;
@@ -527,14 +506,14 @@
                     const itemCats = item.categories || ["未分類"];
                     matchFilter = itemCats.includes(filter);
                 }
-                
                 return matchSearch && matchFilter;
             });
 
             filtered.forEach(item => {
                 const alreadyHas = characters.some(c => c.char === item.char);
                 const div = document.createElement('div');
-                div.className = `char-card rounded-2xl p-2 ${alreadyHas ? 'exists' : 'hover:shadow-md'}`; div.style.backgroundColor = "#F2F2F2";
+                div.className = `char-card rounded-2xl p-2 ${alreadyHas ? 'exists' : 'hover:shadow-md'}`; 
+                div.style.backgroundColor = "#F2F2F2";
                 div.innerHTML = `
                     <span class="chinese-font text-2xl font-bold text-slate-700">${item.char}</span>
                     <span class="text-[9px] text-slate-400 font-bold mt-1">${item.strokes} 劃</span>
@@ -570,19 +549,15 @@
         document.getElementById('save-custom').onclick = () => {
             const char = document.getElementById('custom-char-input').value.trim();
             const stroke = parseInt(document.getElementById('custom-stroke-input').value);
-            const enKey = document.getElementById('custom-en-input').value.trim(); // 英文注釋
-
+            const enKey = document.getElementById('custom-en-input').value.trim(); // 獲取英文注釋
             
             if (!char) return;
 
-            /* 檢查重複增字 */
             const existingIndex = characters.findIndex(item => item.char === char);
             if (existingIndex !== -1) {
-                /* 跳轉選字 */
                 currentIndex = existingIndex;
                 document.getElementById('custom-modal').classList.remove('active');
-                document.getElementById('custom-char-input').value = "";
-                document.getElementById('custom-stroke-input').value = "";
+                clearInputs();
                 clearCanvas();
                 renderSteps();
                 return;
@@ -607,6 +582,12 @@
                 renderGallery();
             }
         };
+
+        function clearInputs() {
+            document.getElementById('custom-char-input').value = "";
+            document.getElementById('custom-stroke-input').value = "";
+            document.getElementById('custom-en-input').value = "";
+        }
 
         document.getElementById('clear-btn').onclick = clearCanvas;
         document.getElementById('undo-btn').onclick = undo;
