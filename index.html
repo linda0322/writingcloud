@@ -258,21 +258,36 @@
 
         /* 登入彈窗 */
         const defaultCharacters = [
-            { char: "我", strokes: 7, completed: false },
-            { char: "你", strokes: 7, completed: false },
-            { char: "他", strokes: 5, completed: false },
-            { char: "愛", strokes: 13, completed: false },
-            { char: "學", strokes: 16, completed: false },
-            { char: "習", strokes: 11, completed: false }
+            { char: "我", strokes: 7, completed: false, en: "me i" },
+            { char: "你", strokes: 7, completed: false, en: "you" },
+            { char: "他", strokes: 5, completed: false, en: "he him" },
+            { char: "愛", strokes: 13, completed: false, en: "love" },
+            { char: "學", strokes: 16, completed: false, en: "learn study school" },
+            { char: "習", strokes: 11, completed: false, en: "learn practice" }
         ];
 
         /* 字庫 Database */
         let masterLibrary = [
-            { char: "車", strokes: 7, categories: ["物品"] }, { char: "馬", strokes: 10, categories: ["動物"] }, { char: "鳥", strokes: 11, categories: ["動物"] }, { char: "魚", strokes: 11, categories: ["動物"] },
-            { char: "雲", strokes: 12, categories: ["自然"] }, { char: "雨", strokes: 8, categories: ["自然"] }, { char: "風", strokes: 9, categories: ["自然"] }, { char: "雪", strokes: 11, categories: ["自然"] },
-            { char: "春", strokes: 9, categories: ["時間"] }, { char: "夏", strokes: 10, categories: ["時間"] }, { char: "秋", strokes: 9, categories: ["時間"] }, { char: "冬", strokes: 5, categories: ["時間"] }
+            { char: "我", strokes: 7, categories: ["代詞"], en: "me i" },
+            { char: "你", strokes: 7, categories: ["代詞"], en: "you" },
+            { char: "他", strokes: 5, categories: ["代詞"], en: "he him" },
+            { char: "愛", strokes: 13, categories: [""], en: "love" },
+            { char: "學", strokes: 16, categories: [""], en: "learn study school" },
+            { char: "習", strokes: 11, categories: [""], en: "learn practice" }
+            { char: "車", strokes: 7, categories: ["物品"], en: "car vehicle" },
+            { char: "馬", strokes: 10, categories: ["動物"], en: "horse" },
+            { char: "鳥", strokes: 11, categories: ["動物"], en: "bird" },
+            { char: "魚", strokes: 11, categories: ["動物"], en: "fish" },
+            { char: "雲", strokes: 12, categories: ["自然"], en: "cloud" },
+            { char: "雨", strokes: 8, categories: ["自然"], en: "rain" },
+            { char: "風", strokes: 9, categories: ["自然"], en: "wind" },
+            { char: "雪", strokes: 11, categories: ["自然"], en: "snow" },
+            { char: "春", strokes: 9, categories: ["時間"], en: "spring" },
+            { char: "夏", strokes: 10, categories: ["時間"], en: "summer" },
+            { char: "秋", strokes: 9, categories: ["時間"], en: "autumn fall" },
+            { char: "冬", strokes: 5, categories: ["時間"], en: "winter" }
         ];
-
+        
         let characters = [...defaultCharacters];
         let currentIndex = 0;
         let isDrawing = false;
@@ -498,12 +513,14 @@
 
         function renderGallery() {
             const grid = document.getElementById('gallery-grid');
-            const search = document.getElementById('gallery-search').value.trim();
+            const search = document.getElementById('gallery-search').value.trim().toLowerCase();
             const filter = document.getElementById('gallery-category-filter').value;
             grid.innerHTML = '';
 
             const filtered = masterLibrary.filter(item => {
-                const matchSearch = !search || item.char.includes(search);
+                const matchChar = item.char.includes(search);
+                const matchEn = item.en ? item.en.toLowerCase().includes(search) : false;
+                const matchSearch = !search || matchChar || matchEn;
                 
                 let matchFilter = true;
                 if (filter !== 'all') {
@@ -553,6 +570,8 @@
         document.getElementById('save-custom').onclick = () => {
             const char = document.getElementById('custom-char-input').value.trim();
             const stroke = parseInt(document.getElementById('custom-stroke-input').value);
+            const enKey = document.getElementById('custom-en-input').value.trim(); // 英文注釋
+
             
             if (!char) return;
 
