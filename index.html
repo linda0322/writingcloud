@@ -241,28 +241,34 @@
         const progressText = document.getElementById('progress-text');
         const successTick = document.getElementById('success-tick');
 
+        /* 字卡 */
         const defaultCharacters = [
-            { char: "我", strokes: 7, completed: false, en: "me i" },
+            { char: "我", strokes: 7, completed: false, en: "i me" },
             { char: "你", strokes: 7, completed: false, en: "you" },
+            { char: "您", strokes: 11, completed: false, en: "you" },
             { char: "他", strokes: 5, completed: false, en: "he him" },
-            { char: "愛", strokes: 13, completed: false, en: "love" },
-            { char: "學", strokes: 16, completed: false, en: "learn study school" },
-            { char: "習", strokes: 11, completed: false, en: "learn practice" }
+            { char: "她", strokes: 6, completed: false, en: "she her" },
+            { char: "牠", strokes: 7, completed: false, en: "it animal" },
+            { char: "它", strokes: 5, completed: false, en: "it item" },
+            { char: "們", strokes: 10, completed: false, en: "they them" }
         ];
 
         let masterLibrary = [
-            { char: "車", strokes: 7, categories: ["物品"], en: "car vehicle" },
-            { char: "馬", strokes: 10, categories: ["動物"], en: "horse" },
-            { char: "鳥", strokes: 11, categories: ["動物"], en: "bird" },
-            { char: "魚", strokes: 11, categories: ["動物"], en: "fish" },
-            { char: "雲", strokes: 12, categories: ["自然"], en: "cloud" },
-            { char: "雨", strokes: 8, categories: ["自然"], en: "rain" },
-            { char: "風", strokes: 9, categories: ["自然"], en: "wind" },
-            { char: "雪", strokes: 11, categories: ["自然"], en: "snow" },
-            { char: "春", strokes: 9, categories: ["時間"], en: "spring" },
-            { char: "夏", strokes: 10, categories: ["時間"], en: "summer" },
-            { char: "秋", strokes: 9, categories: ["時間"], en: "autumn fall" },
-            { char: "冬", strokes: 5, categories: ["時間"], en: "winter" }
+            { char: "我", strokes: 7, categories: ["代詞"], en: "i me" },
+            { char: "你", strokes: 7, categories: ["代詞"], en: "you" },
+            { char: "您", strokes: 11, categories: ["代詞"], en: "you" },
+            { char: "他", strokes: 5, categories: ["代詞"], en: "he him" },
+            { char: "她", strokes: 6, categories: ["代詞"], en: "she her" },
+            { char: "牠", strokes: 7, categories: ["代詞"], en: "it animal" },
+            { char: "它", strokes: 5, categories: ["代詞"], en: "it item" },
+            { char: "們", strokes: 10, categories: ["代詞"], en: "they them" },
+            { char: "這", strokes: 11, categories: ["代詞"], en: "this these" },
+            { char: "此", strokes: 6, categories: ["代詞"], en: "this these" },
+            { char: "那", strokes: 7, categories: ["代詞"], en: "that those" },
+            { char: "哪", strokes: 10, categories: ["代詞"], en: "where which" },
+            { char: "誰", strokes: 15, categories: ["代詞"], en: "who" },
+            { char: "些", strokes: 7, categories: ["量詞"], en: "some few several little" }
+            
         ];
 
         let characters = [...defaultCharacters];
