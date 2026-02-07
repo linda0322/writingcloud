@@ -358,7 +358,7 @@
             let completedCount = 0;
             characters.forEach((item, i) => {
                 const btn = document.createElement('button');
-                btn.className = `step-btn relative flex-none w-12 h-12 rounded-2xl bg-white chinese-font font-bold text-xl shadow-sm border-2 transition-all ${i === currentIndex ? 'active border-blue-200' : 'text-slate-400 border-transparent'}`;
+                btn.className = `step-btn relative flex-none w-12 h-12 rounded-2xl bg-white chinese-font name-border text-xl shadow-sm border-2 transition-all ${i === currentIndex ? 'active border-blue-200' : 'text-slate-400 border-transparent'}`;
                 if (item.completed) { btn.classList.add('completed'); completedCount++; }
                 btn.innerText = item.char;
                 btn.onclick = () => { currentIndex = i; clearCanvas(); renderSteps(); };
