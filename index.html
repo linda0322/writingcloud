@@ -8,10 +8,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* 引入芫荽體 */
         @font-face {
             font-family: 'Iansui';
             src: url('https://cdn.jsdelivr.net/gh/ButTaiwan/iansui@9d9a8e68bf1e138dd91e562eeff28d95bca33196/fonts/ttf/Iansui-Regular.ttf') format('truetype');
+            font-display: swap;
+        }
+         @font-face {
+            font-family: 'Cubic11';
+            src: url('https://cdn.jsdelivr.net/gh/ACh-K/Cubic-11@90bc0e197c4db0fc8c75fe30c2d82dea03da707e/fonts/ttf/Cubic_11.ttf') format('truetype');
             font-display: swap;
         }
 
@@ -94,6 +98,15 @@
         }
         .char-card:hover { transform: translateY(-2px); background-color: #F2F2F2; }
         .char-card.exists { opacity: 0.5; cursor: default; }
+        .font-cubic { font-family: 'Cubic11', sans-serif; }
+        .text-border {
+            -webkit-text-stroke: 1px currentColor;
+            paint-order: stroke fill;
+        }
+        .name-border {
+            -webkit-text-stroke: 0.5px currentColor;
+            paint-order: stroke fill;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -108,8 +121,8 @@
         <div class="mb-4 px-1 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <div class="glass-panel px-4 py-1.5 rounded-full shadow-md flex items-center gap-2">
-                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">學生</span>
-                    <span id="display-username" class="text-sm font-bold text-slate-700">載入中...</span>
+                    <span class="text-[10px] text-slate-500 font-cubic name-border tracking-wider">學生</span>
+                    <span id="display-username" class="text-sm font-cubic name-border text-slate-700">載入中...</span>
                 </div>
                 <button id="logout-btn" class="p-2 glass-panel rounded-full text-red-500 hover:bg-white/50 active:scale-90 transition-all shadow-lg" title="登出">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -123,9 +136,9 @@
         <!--操作欄-->
         <div class="flex justify-between items-center mb-6 px-1">
             <div class="flex items-center gap-3 glass-panel px-4 py-2 rounded-full shadow-lg">
-                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">筆劃</span>
-                <span id="stroke-count" class="text-2xl font-black text-slate-700">0</span>
-                <span id="target-stroke" class="text-xs px-2 py-0.5 bg-slate-100 text-slate-400 rounded-full">/ 0</span>
+                <span class="text-[10px] text-slate-500 font-cubic name-border uppercase tracking-wider">筆劃</span>
+                <span id="stroke-count" class="text-2xl font-cubic name-border text-slate-700">0</span>
+                <span id="target-stroke" class="text-xs px-2 py-0.5 bg-slate-100 font-cubic name-border text-slate-400 rounded-full">/ 0</span>
             </div>
             <div class="flex gap-2">
                 <button id="gallery-trigger-btn" class="p-2 glass-panel text-slate-600 rounded-full hover:bg-white transition-colors shadow-lg active:scale-95" title="字庫">
@@ -137,7 +150,7 @@
                 <button id="undo-btn" class="p-2 glass-panel text-slate-600 rounded-full hover:bg-white transition-colors shadow-lg active:scale-95" title="還原">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
                 </button>
-                <button id="clear-btn" class="px-4 py-2 glass-panel text-slate-600 rounded-full hover:bg-white transition-colors font-bold text-xs shadow-lg active:scale-95">重寫</button>
+                <button id="clear-btn" class="px-4 py-2 glass-panel text-slate-600 rounded-full hover:bg-white transition-colors font-cubic name-border text-xs shadow-lg active:scale-95">重寫</button>
             </div>
         </div>
 
