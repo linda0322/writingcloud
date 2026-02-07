@@ -216,7 +216,7 @@
                     <div class="w-10 h-10 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M16 2v20"/></svg>
                     </div>
-                    <h3 class="font-bold text-slate-700 text-xl">字庫</h3>
+                    <h3 class="font-cubic text-border text-slate-700 text-xl">字庫</h3>
                 </div>
                 <button id="close-gallery" class="p-2 hover:bg-slate-100 rounded-full transition-colors">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -228,7 +228,7 @@
                     <input type="text" id="gallery-search" placeholder="搜尋" class="w-full bg-slate-100 border-none rounded-2xl px-4 py-3 pl-10 text-sm font-cubic name-border outline-none focus:ring-2 focus:ring-amber-200">
                     <svg class="absolute left-3 top-3.5 text-slate-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
                 </div>
-                <select id="gallery-category-filter" class="bg-slate-100 border-none rounded-2xl px-4 text-sm font-cubic outline-none min-w-[170px]">
+                <select id="gallery-category-filter" class="bg-slate-100 border-none rounded-2xl px-4 text-sm font-cubic name-border outline-none min-w-[170px]">
                     <option value="all">所有主題</option>
                 </select>
             </div>
@@ -529,7 +529,7 @@
                 div.className = `char-card rounded-2xl p-2 ${alreadyHas ? 'exists' : 'hover:shadow-md'}`; 
                 div.style.backgroundColor = "#F2F2F2";
                 div.innerHTML = `
-                    <span class="chinese-font text-2xl font-bold text-slate-700">${item.char}</span>
+                    <span class="chinese-font text-2xl text-slate-700">${item.char}</span>
                     <span class="text-[9px] text-slate-400 font-bold mt-1">${item.strokes} 劃</span>
                 `;
                 if (!alreadyHas) {
